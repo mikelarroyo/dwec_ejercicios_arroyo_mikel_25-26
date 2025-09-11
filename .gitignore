@@ -416,3 +416,41 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# --- SO (Windows / macOS) ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+ehthumbs.db
+Thumbs.db
+$RECYCLE.BIN/
+desktop.ini
+
+# --- Entornos y secretos ---
+.env.*
+!.env.example   # permite el ejemplo si lo usas
+
+# --- Logs de gestores de paquetes ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Cachés y builds front-end ---
+dist/
+build/
+coverage/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+.vite/
+.angular/cache/
+.vercel/
+.turbo/
+
+# --- IDEs comunes ---
+.idea/
+
