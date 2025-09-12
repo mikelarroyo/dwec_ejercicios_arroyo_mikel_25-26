@@ -10,13 +10,13 @@ if(isNaN(num1)){
     alert("lo que has escrito no es un numero")
     console.log("Lo que has escrito no es un numero");
 }else {
-  if (numero % 2 === 0 && numero % 5 === 0) {
+  if (numero % 2 == 0 && numero % 5 == 0) {
     alert(numero + " es múltiplo de 2 y de 5.");
     console.log(numero, "es múltiplo de 2 y de 5.");
-  } else if (numero % 2 === 0) {
+  } else if (numero % 2 == 0) {
     alert(numero + " es múltiplo de 2.");
     console.log(numero, "es múltiplo de 2.");
-  } else if (numero % 5 === 0) {
+  } else if (numero % 5 == 0) {
     alert(numero + " es múltiplo de 5.");
     console.log(numero, "es múltiplo de 5.");
   } else {
