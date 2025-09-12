@@ -9,9 +9,7 @@ let num1 = parseFloat(prompt("Número 1:"));
 if(isNaN(num1)){
     alert("lo que has escrito no es un numero")
     console.log("Lo que has escrito no es un numero");
-
 }else {
-  // Calcular múltiplos
   if (numero % 2 === 0 && numero % 5 === 0) {
     alert(numero + " es múltiplo de 2 y de 5.");
     console.log(numero, "es múltiplo de 2 y de 5.");
