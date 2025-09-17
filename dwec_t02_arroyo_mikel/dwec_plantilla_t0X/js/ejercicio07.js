@@ -19,11 +19,13 @@ Si alguno de los dos números es cero → también se detiene.
 En cualquier otro caso → se sigue pidiendo otra pareja.
  */
 
-let num1 = Number(prompt("Escoge el numero 1"))
-let num2 = Number(prompt("Escoge el numero 2"))
-
+let num1 , num2;
 do {
+num1 = Number(prompt("Escoge el numero 1"))
+num2 = Number(prompt("Escoge el numero 2"))
 
 
-} while ();
+} while (num1!==num2 && num1!==0 && num2!==0);
 
+console.log("Has salido del bucle");
+alert("Has salido del bucle")
