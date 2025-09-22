@@ -55,7 +55,7 @@ function tarifaPorTurno(turno) {
     return TarifaNoche;
 }
 
-// ---- Bucle principal terminado ----
+
 while (confirm("¿Quieres introducir un trabajador?")) {
   const nombre = pedirNombreTrabajador();
   if (nombre === null) {
@@ -98,6 +98,5 @@ while (confirm("¿Quieres introducir un trabajador?")) {
   console.log(info);
 }
 
-// ---- Totales ----
 alert("Total de salarios abonados: " + totalAbonado.toFixed(2) + " €");
 console.log("Total de salarios abonados: " + totalAbonado.toFixed(2) + " €");
