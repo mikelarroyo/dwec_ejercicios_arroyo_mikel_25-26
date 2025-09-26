@@ -9,3 +9,16 @@ console.log("T03 - Ejercicio 18");
  *  (la fecha solo será correcta con este formato: DD/MM/YYYY).
 
  */
+
+let entrada = prompt("Escribe tu fecha de nacimiento: ")
+
+function Fecha(entrada) {
+    let partes = entrada.split("/");
+    let dia = parseInt(partes[0], 10);
+    let mes = parseInt(partes[1], 10);
+    let anio = parseInt(partes[2], 10);
+    return new Date(anio, mes - 1, dia);
+}
+
+let cumpleaños= 
+
