@@ -9,7 +9,7 @@ console.log("T03 - Ejercicio 18");
  *  (la fecha solo será correcta con este formato: DD/MM/YYYY).
 
  */
-
+/** 
 let entrada = prompt("Escribe tu fecha de nacimiento: ")
 
 function Fecha(entrada) {
@@ -21,4 +21,4 @@ function Fecha(entrada) {
 }
 
 let cumpleaños= 
-
+**/
