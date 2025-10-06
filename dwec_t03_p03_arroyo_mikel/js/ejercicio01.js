@@ -1,4 +1,4 @@
-console.log("T03 - Ejercicio 01");
+
 
 
 /**
@@ -26,16 +26,16 @@ Asegúrate de que la eliminación no deje huecos en el array (undefined).
 
  */
 
+console.log("T03 - Ejercicio 01");
 const miArray = [2, 4, 6, 7, 10, 12];
 
-elementoBorradoPrimero = null;
-elementoBorradoUltimo = null;
-tipoOperacion = null;
+let elementoBorradoPrimero = null;
+let elementoBorradoUltimo = null;
+let tipoOperacion = null;
+let cancelado = false;
 
 let opcion;
-
-
-
+if(miArray.length>0)
 do {
 
     console.log(miArray);
@@ -46,13 +46,19 @@ do {
         "3 - Borrar ambos \n" +
         "4 - Deshacer ultima operacion \n" +
         "5 - Salir y mostrar");
+    
+    if(opcion === null) {
+        cancelado = true;
+        alert("Operacion cancelada por el usuario");
+    }
+   
 
     switch (opcion) {
 
         case "1":
             if (miArray.length > 0) {
                 elementoBorradoPrimero = miArray[0];
-                elementoBorradoUltimo = null;
+                elementoBorradoUltimo = undefined;
                 tipoOperacion = "primero";
 
 
@@ -86,7 +92,7 @@ do {
             } else
                 console.log("No se ha podido borrar ambos");
             break;
-        case "4":
+    case "4":
             if (tipoOperacion != null) {
 
                 switch (tipoOperacion) {
@@ -97,11 +103,12 @@ do {
                         break;
                     case "ultimo":
                         miArray.push(elementoBorradoUltimo);
-                        console.log("Operacion deshecha con éxisto, ambos elementos recuperados");
+                        console.log("Operacion deshecha con éxito, último elemento recuperado");
                         break;
                     case "ambos":
                         miArray.unshift(elementoBorradoPrimero);
                         miArray.push(elementoBorradoUltimo);
+                        console.log("Operacion deshecha con éxito, ambos elementos recuperados");
                         break;
                 }
 
@@ -120,8 +127,9 @@ do {
 
         default:
             console.log("Error, operacion no valida");
+            alert("Error, elige una operacion entre el 1 y el 5")
     }
 
-} while (opcion != 5 && miArray.length > 0);
+} while (opcion !== "5" && miArray.length>0);
 
 console.log("TU array es: " + miArray);
