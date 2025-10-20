@@ -59,46 +59,71 @@ function agregarTarea(indiceCategoria, nombreTarea) {
     indiceCategoria >= categorias.length ||
     isNaN(indiceCategoria)
   ) {
-    console.log("Indice de categoria no valido");
+    console.log("Índice de categoría no válido.");
     return;
   }
+
   const tareaLimpia = nombreTarea.trim();
   if (tareaLimpia === "") {
-    console.log("No se puede agregar una tarea sin nombre");
+    console.log("No se puede agregar una tarea sin nombre.");
     return;
   }
+
   const listaTareas = categorias[indiceCategoria][1];
-  listaTareas.push([tareaLimpia, "toDo"]);
-  console.log(
-    `Tarea '${tareaLimpia}' añadida a la categoría '${categorias[indiceCategoria][0]}'`
-  );
-  console.log("Categorías actuales:\n", JSON.stringify(categorias, null, 2));
+  const estadoInicial = "toDo";
+
+
+  if (!estadosPosibles.has(estadoInicial)) {
+    console.log(`Error: el estado '${estadoInicial}' no es válido.`);
+    return;
+  }
+
+  listaTareas.push([tareaLimpia, estadoInicial]);
+  console.log(`Tarea '${tareaLimpia}' añadida a '${categorias[indiceCategoria][0]}' con estado '${estadoInicial}'.`);
 }
+
 
 function marcarTareasDone(indiceCategoria, nombreTarea) {
   let encontrada = false;
+
   if (
     indiceCategoria < 0 ||
     indiceCategoria >= categorias.length ||
     isNaN(indiceCategoria)
   ) {
-    console.log("indice de categoria no valido");
+    console.log("Índice de categoría no válido.");
     return;
   }
-  if (categorias[indiceCategoria][1].length > 0) {
-    const listaTareas = categorias[indiceCategoria][1];
-    for (let i = 0; i < listaTareas.length; i++) {
-      if (listaTareas[i][0] === nombreTarea) {
-        encontrada = true;
-        listaTareas[i][1] = "done";
-        console.log(`Tarea '${listaTareas[i][0]}' cambiada al estado 'done'`);
+
+  const listaTareas = categorias[indiceCategoria][1];
+  if (listaTareas.length === 0) {
+    console.log("No hay tareas en esta categoría.");
+    return;
+  }
+
+  for (let i = 0; i < listaTareas.length; i++) {
+    if (listaTareas[i][0] === nombreTarea) {
+      encontrada = true;
+
+      if (listaTareas[i][1] === "done") {
+        console.log(`La tarea '${listaTareas[i][0]}' ya estaba hecha.`);
+      } else {
+      
+        if (estadosPosibles.has("done")) {
+          listaTareas[i][1] = "done";
+          console.log(`Tarea '${listaTareas[i][0]}' marcada como hecha.`);
+        } else {
+          console.log("Error: el estado 'done' no es válido en el Set de estados posibles.");
+        }
       }
     }
   }
-  if (encontrada === false) {
-    console.log("No se ha encontrado ninguna tarea con ese nombre");
+
+  if (!encontrada) {
+    console.log("No se ha encontrado ninguna tarea con ese nombre.");
   }
 }
+
 
 function borrarCategoria(indiceCategoria) {
   if (
