@@ -203,29 +203,29 @@ function menuSeleccionarCategoria() {
     opcionCategoria = Number(entrada.trim());
     const indiceReal = opcionCategoria - 1;
 
-    // --- Seleccionar una categoría ---
+
     if (opcionCategoria >= 1 && opcionCategoria <= categorias.length) {
       console.log(`\nCategoría seleccionada: ${categorias[indiceReal][0]}`);
       menuCategoria(indiceReal);
 
-    // --- Atrás ---
+
     } else if (opcionCategoria === indiceAtras) {
       console.log("Volviendo al menú principal...");
       continuar = false;
 
-    // --- Mostrar todas las tareas toDo ---
+
     } else if (opcionCategoria === indiceToDo) {
       mostrarTareasPendientes();
 
-    // --- Buscar tareas por texto ---
+
     } else if (opcionCategoria === indiceBuscar) {
       buscarTareasPorTexto();
 
-    // --- Resumen global ---
+
     } else if (opcionCategoria === indiceResumen) {
       resumenGlobal();
 
-    // --- Opción inválida ---
+
     } else {
       console.log("Opción no válida. Introduce un número correcto.");
     }
@@ -313,11 +313,6 @@ function buscarTareasPorTexto() {
     }
   }
 }
-
-
-
-
-
 
 
 if (categorias.length === 0) {
@@ -425,18 +420,18 @@ function menuCategoria(indiceCategoria) {
 
     opcion = prompt(
       "\nElige una opción:\n" +
-        "Introduce el número o números de las tareas para marcarlas como 'done' (separados por comas), o elige:\n" +
-        "4. Añadir nueva tarea\n" +
-        "5. Borrar tarea\n" +
-        "6. Atrás\n" +
-        "7. Deshacer últimos 'done' realizados"
+      "Introduce el número o números de las tareas para marcarlas como 'done' (separados por comas), o elige:\n" +
+      "4. Añadir nueva tarea\n" +
+      "5. Borrar tarea\n" +
+      "6. Atrás\n" +
+      "7. Deshacer últimos 'done' realizados"
     );
 
-    // Limpieza y parsing
+
     const entrada = opcion ? opcion.trim() : "";
     const numeros = entrada.split(",").map((n) => Number(n.trim())).filter((n) => !isNaN(n));
 
-    // --- Si el usuario introduce números válidos ---
+
     if (numeros.length > 0 && numeros.every((n) => n >= 1 && n <= categoria[1].length)) {
       const indicesHechos = [];
 
@@ -526,9 +521,5 @@ function resumenGlobal() {
     console.log(`${nombreCat} → ${total} tareas (${hechas} done)`);
   }
 }
-
-
-
-
 
 console.log("Programa finalizado.");
