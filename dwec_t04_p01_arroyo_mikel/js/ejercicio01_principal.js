@@ -28,5 +28,23 @@ En este script, crea una función con nombre 'funcionPrueba1()' donde primero se
 
 
 
+function funcionPrueba1() {
+    const alumno1 = new Alumno("12345678A", "Ana Lopez", new Date(2001,4,15),8,7.5,9, "m");
+    const alumno2 = new Alumno("87654321B", "Carlos Pérez", new Date(2000, 9, 2), 3, 5, 4.5, "h");
 
+    console.log("----Alumno 1---");
+    console.log(alumno1.mostrarInformacion());
 
+    console.log("----Alumno 2---");
+    console.log(alumno2.mostrarInformacion());
+
+    console.log("Comparar");
+    console.log(alumno1.comparar(alumno2));
+    console.log(alumno2.comparar(alumno1));
+
+    console.log("Esta Aprobado?");
+    console.log(alumno1.estaAprobado());
+    console.log(alumno2.estaAprobado());
+}
+
+funcionPrueba1();

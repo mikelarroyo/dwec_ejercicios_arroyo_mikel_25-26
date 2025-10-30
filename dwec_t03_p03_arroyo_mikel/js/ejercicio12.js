@@ -1,39 +1,38 @@
 console.log("T03 - Ejercicio 10");
 
 const categorias = [];
-const estadosPosibles = new Set(["toDo", "done"]);
-const undoStack = [];
+const estadosValidos = new Set(["toDo", "done"]);
+const pilaDeshacer = [];
 
+let opcionPrincipal = -1;
 
-let opcion = -1;
+function crearCategoria(nombreCategoria) {
+  const nombre = nombreCategoria ? nombreCategoria.trim() : "";
 
-function crearCategoria(nombre) {
-  const nombreLimpio = nombre ? nombre.trim() : "";
-
-  if (nombreLimpio === "") {
+  if (nombre === "") {
     console.log("No se puede crear una categoría sin nombre.");
     return;
   }
 
   // Comprobar si ya existe
   for (let i = 0; i < categorias.length; i++) {
-    if (categorias[i][0].toLowerCase() === nombreLimpio.toLowerCase()) {
-      console.log(`La categoría '${nombreLimpio}' ya existe.`);
+    if (categorias[i][0].toLowerCase() === nombre.toLowerCase()) {
+      console.log(`La categoría '${nombre}' ya existe.`);
       return;
     }
   }
 
   // Crear la categoría
-  categorias.push([nombreLimpio, []]);
-  console.log(`Categoría '${nombreLimpio}' creada correctamente.`);
+  categorias.push([nombre, []]);
+  console.log(`Categoría '${nombre}' creada correctamente.`);
 
   // Si es la primera categoría, mostrar menú adicional
   if (categorias.length === 1) {
     const opcion = prompt(
       "¿Qué deseas hacer ahora?\n" +
-      "1. Añadir una tarea a esta categoría\n" +
-      "2. Crear otra categoría nueva\n" +
-      "3. Volver al menú principal"
+        "1. Añadir una tarea a esta categoría\n" +
+        "2. Crear otra categoría nueva\n" +
+        "3. Volver al menú principal"
     );
 
     if (opcion === "1") {
@@ -45,9 +44,9 @@ function crearCategoria(nombre) {
         console.log("No se puede añadir una tarea vacía.");
       }
     } else if (opcion === "2") {
-      const nuevaCat = prompt("Introduce el nombre de la nueva categoría:");
-      if (nuevaCat && nuevaCat.trim() !== "") {
-        crearCategoria(nuevaCat);
+      const nueva = prompt("Introduce el nombre de la nueva categoría:");
+      if (nueva && nueva.trim() !== "") {
+        crearCategoria(nueva);
       }
     } else {
       console.log("Volviendo al menú principal...");
@@ -55,70 +54,66 @@ function crearCategoria(nombre) {
   }
 }
 
-function agregarTarea(indiceCategoria, nombreTarea) {
-  if (
-    indiceCategoria < 0 ||
-    indiceCategoria >= categorias.length ||
-    isNaN(indiceCategoria)
-  ) {
+function agregarTarea(indiceCat, nombreTarea) {
+  if (indiceCat < 0 || indiceCat >= categorias.length || isNaN(indiceCat)) {
     console.log("Índice de categoría no válido.");
     return;
   }
 
-  const tareaLimpia = nombreTarea.trim();
-  if (tareaLimpia === "") {
+  const tarea = nombreTarea.trim();
+  if (tarea === "") {
     console.log("No se puede agregar una tarea sin nombre.");
     return;
   }
 
-  const listaTareas = categorias[indiceCategoria][1];
-  const estadoInicial = "toDo";
+  const tareasCategoria = categorias[indiceCat][1];
+  const estadoPorDefecto = "toDo";
 
-
-  if (!estadosPosibles.has(estadoInicial)) {
-    console.log(`Error: el estado '${estadoInicial}' no es válido.`);
+  if (!estadosValidos.has(estadoPorDefecto)) {
+    console.log(`Error: el estado '${estadoPorDefecto}' no es válido.`);
     return;
   }
 
-  listaTareas.push([tareaLimpia, estadoInicial]);
-  console.log(`Tarea '${tareaLimpia}' añadida a '${categorias[indiceCategoria][0]}' con estado '${estadoInicial}'.`);
+  tareasCategoria.push([tarea, estadoPorDefecto]);
+  console.log(
+    `Tarea '${tarea}' añadida a '${categorias[indiceCat][0]}' con estado '${estadoPorDefecto}'.`
+  );
 }
 
-
-function marcarTareasDone(indiceCategoria, nombreTarea) {
+function marcarTareasDone(indiceCat, nombreTarea) {
   let encontrada = false;
 
-  if (indiceCategoria < 0 || indiceCategoria >= categorias.length || isNaN(indiceCategoria)) {
+  if (indiceCat < 0 || indiceCat >= categorias.length || isNaN(indiceCat)) {
     console.log("Índice de categoría no válido.");
     return;
   }
 
-  const listaTareas = categorias[indiceCategoria][1];
-  if (listaTareas.length === 0) {
+  const tareasCategoria = categorias[indiceCat][1];
+  if (tareasCategoria.length === 0) {
     console.log("No hay tareas en esta categoría.");
     return;
   }
 
   const indicesHechos = [];
 
-  for (let i = 0; i < listaTareas.length; i++) {
-    if (listaTareas[i][0] === nombreTarea) {
+  for (let i = 0; i < tareasCategoria.length; i++) {
+    if (tareasCategoria[i][0] === nombreTarea) {
       encontrada = true;
 
-      if (listaTareas[i][1] === "done") {
-        console.log(`La tarea '${listaTareas[i][0]}' ya estaba hecha.`);
+      if (tareasCategoria[i][1] === "done") {
+        console.log(`La tarea '${tareasCategoria[i][0]}' ya estaba hecha.`);
       } else {
-        listaTareas[i][1] = "done";
+        tareasCategoria[i][1] = "done";
         indicesHechos.push(i);
-        console.log(`Tarea '${listaTareas[i][0]}' marcada como hecha.`);
+        console.log(`Tarea '${tareasCategoria[i][0]}' marcada como hecha.`);
       }
     }
   }
 
   // Guardar en pila de deshacer
   if (indicesHechos.length > 0) {
-    undoStack.push([indiceCategoria, indicesHechos]);
-    if (undoStack.length > 5) undoStack.shift(); // mantener 5 últimas
+    pilaDeshacer.push([indiceCat, indicesHechos]);
+    if (pilaDeshacer.length > 5) pilaDeshacer.shift(); // mantener 5 últimas
   }
 
   if (!encontrada) {
@@ -126,35 +121,29 @@ function marcarTareasDone(indiceCategoria, nombreTarea) {
   }
 }
 
-
-
-function borrarCategoria(indiceCategoria) {
-  if (
-    indiceCategoria < 0 ||
-    indiceCategoria >= categorias.length ||
-    isNaN(indiceCategoria)
-  ) {
+function borrarCategoria(indiceCat) {
+  if (indiceCat < 0 || indiceCat >= categorias.length || isNaN(indiceCat)) {
     console.log("Índice de categoría no válido.");
     return;
   }
 
-  const categoria = categorias[indiceCategoria];
+  const categoria = categorias[indiceCat];
   const tareas = categoria[1];
-  let todasDone = true;
+  let todasHechas = true;
 
   for (let i = 0; i < tareas.length; i++) {
     if (tareas[i][1] !== "done") {
-      todasDone = false;
+      todasHechas = false;
       break;
     }
   }
 
-  if (tareas.length === 0 || todasDone) {
+  if (tareas.length === 0 || todasHechas) {
     const confirmacion = prompt(
       `¿Estás seguro de que quieres borrar la categoría '${categoria[0]}'? (S/N)`
     );
     if (confirmacion && confirmacion.trim().toUpperCase() === "S") {
-      categorias.splice(indiceCategoria, 1);
+      categorias.splice(indiceCat, 1);
       console.log(`Categoría '${categoria[0]}' borrada correctamente.`);
     } else {
       console.log("Operación cancelada.");
@@ -172,93 +161,83 @@ function menuSeleccionarCategoria() {
     return null;
   }
 
-  let opcionCategoria = -1;
-  let continuar = true;
+  let opcionSeleccion = -1;
 
-  do {
+  while (true) {
     console.log("\n===== Menú 2 (Ampliado) =====");
 
-    // Listar categorías numeradas
     for (let i = 0; i < categorias.length; i++) {
       console.log(`${i + 1}. ${categorias[i][0]}`);
     }
 
-    // Añadir las nuevas opciones al final
     const indiceAtras = categorias.length + 1;
-    const indiceToDo = categorias.length + 2;
-    const indiceBuscar = categorias.length + 3;
+    const indiceBuscarToDo = categorias.length + 2;
+    const indiceBuscarTexto = categorias.length + 3;
     const indiceResumen = categorias.length + 4;
 
     console.log(`${indiceAtras}. Atrás`);
-    console.log(`${indiceToDo}. Buscar tareas 'toDo' en cualquier categoría.`);
-    console.log(`${indiceBuscar}. Buscar tareas por texto en cualquier categoría.`);
+    console.log(
+      `${indiceBuscarToDo}. Buscar tareas 'toDo' en cualquier categoría.`
+    );
+    console.log(
+      `${indiceBuscarTexto}. Buscar tareas por texto en cualquier categoría.`
+    );
     console.log(`${indiceResumen}. Resumen global de todas las categorías.`);
 
     const entrada = prompt("Introduce el número de la opción que deseas:");
     if (entrada === null) {
       console.log("Operación cancelada.");
-      return;
+      return null;
     }
 
-    opcionCategoria = Number(entrada.trim());
-    const indiceReal = opcionCategoria - 1;
+    opcionSeleccion = Number(entrada.trim());
+    const indiceSeleccionado = opcionSeleccion - 1;
 
-
-    if (opcionCategoria >= 1 && opcionCategoria <= categorias.length) {
-      console.log(`\nCategoría seleccionada: ${categorias[indiceReal][0]}`);
-      menuCategoria(indiceReal);
-
-
-    } else if (opcionCategoria === indiceAtras) {
+    if (opcionSeleccion >= 1 && opcionSeleccion <= categorias.length) {
+      // devolver el índice seleccionado al llamador
+      return indiceSeleccionado;
+    } else if (opcionSeleccion === indiceAtras) {
       console.log("Volviendo al menú principal...");
-      continuar = false;
-
-
-    } else if (opcionCategoria === indiceToDo) {
+      return null;
+    } else if (opcionSeleccion === indiceBuscarToDo) {
       mostrarTareasPendientes();
-
-
-    } else if (opcionCategoria === indiceBuscar) {
+    } else if (opcionSeleccion === indiceBuscarTexto) {
       buscarTareasPorTexto();
-
-
-    } else if (opcionCategoria === indiceResumen) {
+    } else if (opcionSeleccion === indiceResumen) {
       resumenGlobal();
-
-
     } else {
       console.log("Opción no válida. Introduce un número correcto.");
     }
-
-  } while (continuar);
+  }
 }
 
-
 function deshacerUltimoDone() {
-  if (undoStack.length === 0) {
+  if (pilaDeshacer.length === 0) {
     console.log("No hay acciones recientes para deshacer.");
     return;
   }
 
-  const ultimoPaso = undoStack.pop();
-  const indiceCategoria = ultimoPaso[0];
-  const indicesTareas = ultimoPaso[1];
+  const ultimo = pilaDeshacer.pop();
+  const indiceCat = ultimo[0];
+  const indicesTareas = ultimo[1];
 
-  if (indiceCategoria < 0 || indiceCategoria >= categorias.length) {
+  if (indiceCat < 0 || indiceCat >= categorias.length) {
     console.log("Error: categoría inválida en el historial.");
     return;
   }
 
-  const listaTareas = categorias[indiceCategoria][1];
+  const tareasCategoria = categorias[indiceCat][1];
 
   for (let i = 0; i < indicesTareas.length; i++) {
     const idx = indicesTareas[i];
-    if (idx >= 0 && idx < listaTareas.length) {
-      if (listaTareas[idx][1] === "done") {
-        listaTareas[idx][1] = "toDo";
-        console.log(`Deshecho: '${listaTareas[idx][0]}' vuelve a 'toDo'.`);
+    if (idx >= 0 && idx < tareasCategoria.length) {
+      if (tareasCategoria[idx][1] === "done") {
+        tareasCategoria[idx][1] = "toDo";
+        console.log(`Deshecho: '${tareasCategoria[idx][0]}' vuelve a 'toDo'.`);
       } else {
-        console.log(`La tarea '${listaTareas[idx][0]}' ya no estaba en 'done'.`);
+        console.log(
+          `La tarea '${tareasCategoria[idx][0]}' ya no estaba en 'done'.`
+        );
       }
     }
   }
@@ -279,7 +258,8 @@ function mostrarTareasPendientes() {
     }
   }
 
-  if (!hayPendientes) console.log("No hay tareas pendientes en ninguna categoría.");
+  if (!hayPendientes)
+    console.log("No hay tareas pendientes en ninguna categoría.");
 }
 
 function buscarTareasPorTexto() {
@@ -309,11 +289,12 @@ function buscarTareasPorTexto() {
     console.log("No se encontraron tareas que coincidan con la búsqueda.");
   } else {
     for (let i = 0; i < encontradas.length; i++) {
-      console.log(`${encontradas[i][0]} (${encontradas[i][1]}) → ${encontradas[i][2]}`);
+      console.log(
+        `${encontradas[i][0]} (${encontradas[i][1]}) → ${encontradas[i][2]}`
+      );
     }
   }
 }
-
 
 if (categorias.length === 0) {
   console.log("No hay categorías creadas todavía.");
@@ -328,16 +309,16 @@ if (categorias.length === 0) {
 }
 
 do {
-  opcion = prompt(
+  opcionPrincipal = prompt(
     "Menú 1 - Gestión de Categorías\n" +
-    "==============================\n" +
-    "1. Listar categorías\n" +
-    "2. Añadir nueva categoría\n" +
-    "3. Borrar categoría \n" +
-    "4. Salir\n\n" +
-    "Elige una opción (1-4):"
+      "==============================\n" +
+      "1. Listar categorías\n" +
+      "2. Añadir nueva categoría\n" +
+      "3. Borrar categoría \n" +
+      "4. Salir\n\n" +
+      "Elige una opción (1-4):"
   );
-  switch (opcion) {
+  switch (opcionPrincipal) {
     case "1":
       if (categorias.length === 0) {
         console.log("No hay categorías.");
@@ -350,7 +331,7 @@ do {
       break;
 
     case "2":
-      let continuarCat = "S";
+      let seguir = "S";
       do {
         const nombre = prompt("Introduce el nombre de la nueva categoría:");
         if (nombre !== null && nombre.trim() !== "") {
@@ -358,8 +339,8 @@ do {
         } else {
           console.log("No se puede crear una categoría vacía.");
         }
-        continuarCat = prompt("¿Quieres crear otra categoría? (S/N):");
-      } while (continuarCat && continuarCat.toUpperCase() === "S");
+        seguir = prompt("¿Quieres crear otra categoría? (S/N):");
+      } while (seguir && seguir.toUpperCase() === "S");
       break;
 
     case "3":
@@ -386,7 +367,7 @@ do {
           indiceReal >= 0 &&
           indiceReal < categorias.length
         ) {
-          borrarCategoria(indiceReal); //
+          borrarCategoria(indiceReal);
         } else {
           console.log("Número no válido.");
         }
@@ -400,106 +381,130 @@ do {
     default:
       console.log("Opción no válida. Elige un número del 1 al 4.");
   }
-} while (opcion !== "4");
+} while (opcionPrincipal !== "4");
 
 function menuCategoria(indiceCategoria) {
   const categoria = categorias[indiceCategoria];
-  let opcion = "";
+  if (!categoria) {
+    console.log("Categoría no encontrada.");
+    return;
+  }
 
-  do {
+  let salir = false;
+  while (!salir) {
     console.log(`\n===== Menú 3. Categoría ${categoria[0]} =====`);
 
-    if (categoria[1].length === 0) {
-      console.log("No hay tareas todavía en esta categoría.");
-    } else {
-      for (let i = 0; i < categoria[1].length; i++) {
-        const tarea = categoria[1][i];
-        console.log(`${i + 1}. ${tarea[0]} (${tarea[1]})`);
-      }
-    }
+    const tareas = categoria[1];
+    const n = tareas.length;
 
-    opcion = prompt(
-      "\nElige una opción:\n" +
-      "Introduce el número o números de las tareas para marcarlas como 'done' (separados por comas), o elige:\n" +
-      "4. Añadir nueva tarea\n" +
-      "5. Borrar tarea\n" +
-      "6. Atrás\n" +
-      "7. Deshacer últimos 'done' realizados"
+    // construir listado de tareas para el prompt (el usuario no ve la consola)
+    const textoTareas =
+      n === 0
+        ? "No hay tareas todavía en esta categoría.\n\n"
+        : tareas.map((t, i) => `${i + 1}. ${t[0]} (${t[1]})`).join("\n") +
+          "\n\n";
+
+    // índices dinámicos para opciones (empiezan después de la última tarea)
+    const idxAñadir = n + 1;
+    const idxBorrar = n + 2;
+    const idxAtras = n + 3;
+    const idxDeshacer = n + 4;
+
+    const entradaRaw = prompt(
+      `Elige una opción:\n` +
+        `Introduce el número o números de las tareas para marcarlas como 'done' (separados por comas), o elige:\n` +
+        `Categoría: ${categoria[0]}\n\n` +
+        textoTareas +
+        `${idxAñadir}. Añadir nueva tarea\n` +
+        `${idxBorrar}. Borrar tarea\n` +
+        `${idxAtras}. Atrás\n` +
+        `${idxDeshacer}. Deshacer últimos 'done'`
     );
 
-
-    const entrada = opcion ? opcion.trim() : "";
-    const numeros = entrada.split(",").map((n) => Number(n.trim())).filter((n) => !isNaN(n));
-
-
-    if (numeros.length > 0 && numeros.every((n) => n >= 1 && n <= categoria[1].length)) {
-      const indicesHechos = [];
-
-      for (let i = 0; i < numeros.length; i++) {
-        const idx = numeros[i] - 1;
-        const tarea = categoria[1][idx];
-        if (tarea[1] === "done") {
-          console.log(`La tarea '${tarea[0]}' ya estaba hecha.`);
-        } else {
-          tarea[1] = "done";
-          indicesHechos.push(idx);
-          console.log(`Tarea '${tarea[0]}' marcada como hecha.`);
-        }
-      }
-
-      // Registrar el paso en la pila de deshacer
-      if (indicesHechos.length > 0) {
-        undoStack.push([indiceCategoria, indicesHechos]);
-        if (undoStack.length > 5) undoStack.shift();
-      }
-
-    } else if (opcion === "4") {
-      let continuar = "S";
-      do {
-        const nueva = prompt("Introduce el nombre de la nueva tarea:");
-        if (nueva && nueva.trim() !== "") {
-          agregarTarea(indiceCategoria, nueva);
-        } else {
-          console.log("No se puede añadir una tarea vacía.");
-        }
-        continuar = prompt("¿Quieres añadir otra tarea? (S/N):");
-      } while (continuar && continuar.toUpperCase() === "S");
-
-    } else if (opcion === "5") {
-      if (categoria[1].length === 0) {
-        console.log("No hay tareas para borrar.");
-      } else {
-        const numBorrar = Number(prompt("Introduce el número de la tarea que deseas borrar:")) - 1;
-        if (numBorrar >= 0 && numBorrar < categoria[1].length) {
-          const confirmacion = prompt(
-            `¿Seguro que quieres borrar '${categoria[1][numBorrar][0]}'? (S/N)`
-          );
-          if (confirmacion && confirmacion.toUpperCase() === "S") {
-            categoria[1].splice(numBorrar, 1);
-            console.log("Tarea borrada correctamente.");
-          } else {
-            console.log("Operación cancelada.");
-          }
-        } else {
-          console.log("Número de tarea no válido.");
-        }
-      }
-
-    } else if (opcion === "6") {
-      console.log("Volviendo al menú de categorías...");
-      break;
-
-    } else if (opcion === "7") {
-      deshacerUltimoDone();
-
-    } else {
-      console.log("Opción no válida. Introduce números válidos o una opción del 4 al 7.");
+    if (entradaRaw === null) {
+      console.log("Operación cancelada. Volviendo al menú de categorías...");
+      return;
+    }
+    const entrada = entradaRaw.trim();
+    if (entrada === "") {
+      console.log("Entrada vacía.");
+      continue;
     }
 
-  } while (opcion !== "6");
+    // marcar tareas si la entrada son índices válidos
+    const posibles = entrada
+      .split(",")
+      .map((s) => Number(s.trim()))
+      .filter((nv) => !Number.isNaN(nv));
+    if (posibles.length > 0 && posibles.every((v) => v >= 1 && v <= n)) {
+      const hechos = [];
+      for (let k = 0; k < posibles.length; k++) {
+        const idx = posibles[k] - 1;
+        if (tareas[idx][1] !== "done") {
+          tareas[idx][1] = "done";
+          hechos.push(idx);
+          console.log(`Tarea '${tareas[idx][0]}' marcada como hecha.`);
+        } else {
+          console.log(`Tarea '${tareas[idx][0]}' ya estaba hecha.`);
+        }
+      }
+      if (hechos.length) {
+        pilaDeshacer.push([indiceCategoria, hechos]);
+        if (pilaDeshacer.length > 5) pilaDeshacer.shift();
+      }
+      continue;
+    }
+
+    const num = Number(entrada);
+    if (!Number.isNaN(num)) {
+      if (num === idxAñadir) {
+        let seguir = "S";
+        do {
+          const nueva = prompt("Introduce el nombre de la nueva tarea:");
+          if (nueva && nueva.trim() !== "")
+            agregarTarea(indiceCategoria, nueva);
+          else console.log("No se puede añadir una tarea vacía.");
+          seguir = prompt("¿Quieres añadir otra tarea? (S/N):");
+        } while (seguir && seguir.toUpperCase() === "S");
+      } else if (num === idxBorrar) {
+        if (n === 0) {
+          console.log("No hay tareas para borrar.");
+          continue;
+        }
+        const raw = prompt(
+          `Introduce el número de la tarea a borrar (1-${n}):`
+        );
+        if (raw === null) {
+          console.log("Cancelado.");
+          continue;
+        }
+        const toDel = Number(raw.trim());
+        if (!Number.isNaN(toDel) && toDel >= 1 && toDel <= n) {
+          const conf = prompt(
+            `¿Seguro que quieres borrar '${tareas[toDel - 1][0]}'? (S/N)`
+          );
+          if (conf && conf.toUpperCase() === "S") {
+            tareas.splice(toDel - 1, 1);
+            console.log("Tarea borrada.");
+          } else console.log("Operación cancelada.");
+        } else console.log("Número de tarea no válido.");
+      } else if (num === idxAtras) {
+        console.log("Volviendo al menú de categorías...");
+        salir = true;
+      } else if (num === idxDeshacer) {
+        deshacerUltimoDone();
+      } else {
+        console.log("Opción no válida.");
+      }
+    } else {
+      console.log(
+        "Entrada no válida. Introduce números de tareas o una opción mostrada."
+      );
+    }
+  }
 }
 
-// === Ampliación 5 ===
+// === Resumen global ===
 function resumenGlobal() {
   console.log("\n===== RESUMEN GLOBAL DE CATEGORÍAS =====");
 

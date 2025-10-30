@@ -20,7 +20,7 @@ y su sexo ('h', 'm', 'o').
  
 Define el 'constructor' para crear un alumno con todos los datos de interés.
  El constructor recibirá todos los datos del alumno menos su edad y su nota final. La edad y la nota se calcularán automáticamente
-  invocando a métodos del propio objeto que hacen esos cálculos.
+ invocando a métodos del propio objeto que hacen esos cálculos.
  
 Define los siguientes métodos:
 -   	Será necesario definir todos los getter y setter.
@@ -39,19 +39,88 @@ En este script, crea una función con nombre 'funcionPrueba1()' donde primero se
  */
 
 function Alumno(dni, nombre, fechaNacimiento, notaT1, notaT2, notaT3, sexo) {
-  this.dni = dni;
-  this.nombre = nombre;
-  this.fechaNacimiento = fechaNacimiento;
-  this.notaT1 = notaT1;
-  this.notat2 = notaT2;
-  this.notaT3 = notaT3;
-  this.sexp = sexo;
-  this.edad = function () {};
-  this.calcularNota = function () {
+  this._dni = dni;
+  this._nombre = nombre;
+  this._fechaNacimiento = fechaNacimiento;
+  this._notaT1 = notaT1;
+  this._notaT2 = notaT2;
+  this._notaT3 = notaT3;
+  this._sexo = sexo;
+  this.CalcularEdad = function () {
+    const hoy = new Date();
+    const nacimiento = new Date(this.fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
+    }
+    return edad;
+  };
+  this.calculoNotaFinal = function () {
     let media = (this.notaT1 + this.notaT2 + this.notaT3) / 3;
     return Math.round(media * 100) / 100;
   };
+  this.notaFinal = this.calculoNotaFinal();
+  this.cambiarNotas = function (n1, n2, n3) {
+    this.notaT1 = n1;
+    this.notaT2 = n2;
+    this.notaT3 = n3;
+
+    this.notaFinal = this.calculoNotaFinal();
+  };
+
+  this.comparar = function (otroAlumno) {
+    if (!(otroAlumno instanceof Alumno)) {
+      console.log("Error: el parámetro no es un objeto Alumno.");
+      return null;
+    }
+    if (this.notaFinal > otroAlumno.notaFinal) {
+      return 1;
+    } else if (this.notaFinal === otroAlumno.notaFinal) {
+      return -1;
+    } else {
+      return 0;
+    }
+  };
+
+  this.estaAprobado = function () {
+    if (this.notaFinal >= 5) {
+      return true;
+    } else return false;
+  };
+
+  this.mostrarInformacion = function () {
+    return (
+      "DNI: " +
+      this.dni +
+      "\nNombre: " +
+      this.nombre +
+      "\nEdad: " +
+      (typeof this.CalcularEdad === "function" ? this.CalcularEdad() : "N/D") +
+      "\nFecha Nac: " +
+      this.fechaNacimiento +
+      "\nNotas: T1=" +
+      this.notaT1 +
+      ", T2=" +
+      this.notaT2 +
+      ", T3=" +
+      this.notaT3 +
+      "\nNota Final: " +
+      this.notaFinal +
+      "\nSexo: " +
+      this.sexo
+    );
+  };
 }
+Object.defineProperty(Alumno.prototype, "dni", {
+  get: function () {
+    return this._dni;
+  },
+  set: function (v) {
+    this._dni = v == null ? "" : String(v).trim();
+  },
+});
+
 Object.defineProperty(Alumno.prototype, "nombre", {
   get: function () {
     return this._nombre;
@@ -66,8 +135,8 @@ Object.defineProperty(Alumno.prototype, "notaT1", {
     return this._notaT1;
   },
   set: function (nota) {
-    if (isNaN(nota) || num < 0 || num > 10) {
-      this._notaT1= null;
+    if (isNaN(nota) || nota < 0 || nota > 10) {
+      this._notaT1 = null;
     }
     this._notaT1 = Number(nota);
   },
@@ -77,8 +146,8 @@ Object.defineProperty(Alumno.prototype, "notaT2", {
     return this._notaT2;
   },
   set: function (nota) {
-    if (isNaN(nota) || num < 0 || num > 10) {
-      this._notaT2=null;
+    if (isNaN(nota) || nota < 0 || nota > 10) {
+      this._notaT2 = null;
     }
     this._notaT2 = Number(nota);
   },
@@ -88,19 +157,29 @@ Object.defineProperty(Alumno.prototype, "notaT3", {
     return this._notaT3;
   },
   set: function (nota) {
-    if (isNaN(nota) || num < 0 || num > 10) {
-      this._notaT3= null;
+    if (isNaN(nota) || nota < 0 || nota > 10) {
+      this._notaT3 = null;
     }
     this._notaT3 = Number(nota);
   },
 });
 
-Object.defineProperties(Alumno.prototype, "fechaNacimiento", {
-    get: function() {
-        return this._fechaNacimiento;
-    },
-    set: function (fechaNacimiento){
-        if(!(fechaNacimiento instanceof Date))
-            this._fechaNacimiento= null;
-    } 
+Object.defineProperty(Alumno.prototype, "fechaNacimiento", {
+  get: function () {
+    return this._fechaNacimiento;
+  },
+  set: function (fechaNacimiento) {
+    if (!(fechaNacimiento instanceof Date)) this._fechaNacimiento = null;
+  },
 });
+
+Object.defineProperty(Alumno.prototype, "sexo", {
+  get: function () {
+    return this._sexo;
+  },
+  set: function (s) {
+    s = s == null ? "" : String(s).trim().toLowerCase();
+    this._sexo = s === "h" || s === "m" || s === "o" ? s : "";
+  },
+});
+
