@@ -161,46 +161,45 @@ function menuSeleccionarCategoria() {
     return null;
   }
 
-  let opcionSeleccion = -1;
+  let salir = false;
 
-  while (true) {
-    console.log("\n===== Menú 2 (Ampliado) =====");
-
-    for (let i = 0; i < categorias.length; i++) {
-      console.log(`${i + 1}. ${categorias[i][0]}`);
-    }
-
+  while (!salir) {
     const indiceAtras = categorias.length + 1;
     const indiceBuscarToDo = categorias.length + 2;
     const indiceBuscarTexto = categorias.length + 3;
     const indiceResumen = categorias.length + 4;
 
-    console.log(`${indiceAtras}. Atrás`);
-    console.log(
-      `${indiceBuscarToDo}. Buscar tareas 'toDo' en cualquier categoría.`
-    );
-    console.log(
-      `${indiceBuscarTexto}. Buscar tareas por texto en cualquier categoría.`
-    );
-    console.log(`${indiceResumen}. Resumen global de todas las categorías.`);
+    // construir texto del menú y pasarlo al prompt (el usuario lo verá dentro del modal)
+    let textoMenu = "===== Menú 2 (Ampliado) =====\n\n";
+    for (let i = 0; i < categorias.length; i++) {
+      textoMenu += `${i + 1}. ${categorias[i][0]}\n`;
+    }
+    textoMenu += `\n${indiceAtras}. Atrás\n`;
+    textoMenu += `${indiceBuscarToDo}. Buscar tareas 'toDo' en cualquier categoría\n`;
+    textoMenu += `${indiceBuscarTexto}. Buscar tareas por texto en cualquier categoría\n`;
+    textoMenu += `${indiceResumen}. Resumen global de todas las categorías\n\n`;
+    textoMenu += "Introduce el número de la opción que deseas:";
 
-    const entrada = prompt("Introduce el número de la opción que deseas:");
-    if (entrada === null) {
+    const entradaRaw = prompt(textoMenu);
+    if (entradaRaw === null) {
       console.log("Operación cancelada.");
       return null;
     }
 
-    opcionSeleccion = Number(entrada.trim());
-    const indiceSeleccionado = opcionSeleccion - 1;
+    const opcionSeleccion = Number(entradaRaw.trim());
+    if (Number.isNaN(opcionSeleccion)) {
+      console.log("Entrada no válida. Introduce un número.");
+      continue;
+    }
 
     if (opcionSeleccion >= 1 && opcionSeleccion <= categorias.length) {
-      // devolver el índice seleccionado al llamador
-      return indiceSeleccionado;
+      return opcionSeleccion - 1; // índice 0-based
     } else if (opcionSeleccion === indiceAtras) {
       console.log("Volviendo al menú principal...");
       return null;
     } else if (opcionSeleccion === indiceBuscarToDo) {
       mostrarTareasPendientes();
+      // después de mostrar, vuelve a mostrar este menú
     } else if (opcionSeleccion === indiceBuscarTexto) {
       buscarTareasPorTexto();
     } else if (opcionSeleccion === indiceResumen) {
@@ -209,6 +208,8 @@ function menuSeleccionarCategoria() {
       console.log("Opción no válida. Introduce un número correcto.");
     }
   }
+
+  return null;
 }
 
 function deshacerUltimoDone() {
