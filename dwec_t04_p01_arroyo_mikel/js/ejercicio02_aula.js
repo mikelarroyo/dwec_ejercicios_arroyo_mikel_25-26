@@ -49,12 +49,11 @@ Object.defineProperty(Aula.prototype, "alumnos", {
     return this._alumnos;
   },
   set: function (alumnos) {
-    if(!Array.isArray(alumnos))
-    {console.log("Setter alumnos: debe propocionarse un array.")
+    if (!Array.isArray(alumnos)) {
+      console.log("Setter alumnos: debe propocionarse un array.");
       return;
     }
     this._alumnos = alumnos;
-    this._numAlumnos = alumnos.length;
   },
 });
 
@@ -62,15 +61,24 @@ Object.defineProperty(Aula.prototype, "numAlumnos", {
   get: function () {
     return this._alumnos.length;
   },
-  
 });
 
 Object.defineProperty(Aula.prototype, "maxAlumnos", {
   get: function () {
     return this._maxAlumnos;
   },
-  set: function (maxAlumnos) {
-    this._maxAlumnos = maxAlumnos;
+  set: function (valor) {
+    const n = Number(valor);
+    if (!Number.isInteger(n) || n < 0) {
+      console.log("Setter maxAlumnos: debe ser un entero >= 0.");
+      return;
+    }
+    if (Array.isArray(this.alumnos) && n < this.alumnos.length) {
+      console.log(
+        "Setter maxAlumnos: no puede ser menor que el número actual de alumnos."
+      );
+    }
+    this._maxAlumnos = n;
   },
 });
 Object.defineProperty(Aula.prototype, "id", {
@@ -78,7 +86,11 @@ Object.defineProperty(Aula.prototype, "id", {
     return this._id;
   },
   set: function (id) {
-    this._id = id;
+    if (!Number.isInteger(id) || Number(id) < 0) {
+      console.log("Setter id: debe ser un entero > 0");
+      return;
+    }
+    this._id = Number(id);
   },
 });
 Object.defineProperty(Aula.prototype, "descripcion", {
@@ -86,7 +98,11 @@ Object.defineProperty(Aula.prototype, "descripcion", {
     return this._descripcion;
   },
   set: function (descripcion) {
-    this._descripcion = descripcion;
+    if (descripcion == null) {
+      this._descripcion = "";
+      return;
+    }
+    this._descripcion = String(descripcion).trim();
   },
 });
 Object.defineProperty(Aula.prototype, "curso", {
@@ -94,6 +110,178 @@ Object.defineProperty(Aula.prototype, "curso", {
     return this._curso;
   },
   set: function (curso) {
-    this._curso = curso;
+    if (curso === 1 || curso === 2 || curso === 3 || curso === 4) {
+      this._curso = curso;
+    } else {
+      console.log("Setter curso: debe ser 1, 2, 3 o 4.");
+      return;
+    }
   },
 });
+
+
+
+Aula.prototype.haySitioAlumnos = function (cantidad) {
+    const nuevos = parseFloat(cantidad) || 1; 
+    return this.alumnos.length + nuevos <= this._maxAlumnos;
+};
+
+Aula.prototype.hayAlumnos = function () {
+    return this.alumnos.length > 0;
+};
+
+
+Aula.prototype.obtenerSitiosAlumnos = function () {
+    return this._maxAlumnos - this.alumnos.length;
+};
+
+
+
+Aula.prototype.pedirDatosUnAlumno = function () {
+    console.log("Pidiendo datos para UN alumno...");
+    
+    const nombre = prompt("Nombre:");
+    if (nombre === null) return null; 
+
+    const dni = prompt("DNI:");
+    if (dni === null) return null; 
+
+    const fecha = prompt("Fecha Nacimiento (YYYY-MM-DD):");
+    if (fecha === null) return null; 
+
+    const entradaNota1 = prompt("Nota T1:");
+    if (entradaNota1 === null) return null;
+    const n1 = parseFloat(entradaNota1);
+    if (isNaN(n1)) return null; 
+
+    const entradaNota2 = prompt("Nota T2:");
+    if (entradaNota2 === null) return null;
+    const n2 = parseFloat(entradaNota2);
+    if (isNaN(n2)) return null; 
+
+    const entradaNota3 = prompt("Nota T3:");
+    if (entradaNota3 === null) return null;
+    const n3 = parseFloat(entradaNota3);
+    if (isNaN(n3)) return null; 
+    
+    const sexo = prompt("Sexo (h/m/o):");
+    if (sexo === null) return null;
+
+
+    return new Alumno(dni, nombre, fecha, n1, n2, n3, sexo);
+};
+
+Aula.prototype.pedirDatos = function () {
+    const plazasLibres = this.obtenerSitiosAlumnos();
+    
+    const entradaCantidad = prompt(`¿Cuántos alumnos quieres matricular? (Quedan ${plazasLibres} plazas)`);
+    
+    if (entradaCantidad === null) return [];
+
+    const cantidad = parseInt(entradaCantidad, 10);
+    
+    if (isNaN(cantidad) || cantidad <= 0 || cantidad > plazasLibres) {
+        console.log("Cantidad no válida o no hay sitio suficiente.");
+        return [];
+    }
+    
+    const nuevos = [];
+    
+    for (let i = 0; i < cantidad; i++) {
+        const alumno = this.pedirDatosUnAlumno();
+        
+        if (alumno === null) {
+            console.log("Entrada de datos cancelada. Se devuelve un array vacío.");
+            return [];
+        }
+        nuevos.push(alumno);
+    }
+    return nuevos;
+};
+
+
+Aula.prototype.insertarAlumnos = function (arrayAlumnos) {
+    if (!Array.isArray(arrayAlumnos)) {
+        console.warn("insertarAlumnos debe recibir un array.");
+        return;
+    }
+
+    for (let i = 0; i < arrayAlumnos.length; i++) { 
+        if (this.alumnos.length >= this._maxAlumnos) {
+            console.log("Aula llena. Deteniendo la inserción.");
+            break;
+        }
+        this.alumnos.push(arrayAlumnos[i]);
+    }
+};
+
+
+
+Aula.prototype.mostrarDatos = function () {
+    if (!this.hayAlumnos()) {
+        return `Aula ${this._id} (${this._descripcion}): No hay alumnos.`;
+    }
+
+    let salida = `--- Aula ${this._id} (Curso ${this._curso}) - Alumnos: ${this.alumnos.length} ---\n`;
+    
+    this.alumnos.forEach(function(alumno) {
+        salida += alumno.mostrarInformacion() + '\n'; 
+    });
+
+    return salida;
+};
+
+Aula.prototype.mediasNota = function () {
+    if (!this.hayAlumnos()) return 0;
+    
+    let sumaNotas = 0;
+    
+    for (let i = 0; i < this.alumnos.length; i++) {
+        sumaNotas += (this.alumnos[i].notaFinal || 0);
+    }
+    
+    return sumaNotas / this.alumnos.length;
+};
+
+Aula.prototype.mejorNota = function () {
+    if (!this.hayAlumnos()) return null;
+    
+    let mejorAlumno = this.alumnos[0];
+    let mejorNotaValor = mejorAlumno.notaFinal || -1;
+    
+    for (let i = 1; i < this.alumnos.length; i++) {
+        const notaActual = this.alumnos[i].notaFinal || -1;
+        if (notaActual > mejorNotaValor) {
+            mejorNotaValor = notaActual;
+            mejorAlumno = this.alumnos[i];
+        }
+    }
+    return mejorAlumno;
+};
+
+
+Aula.prototype.porcentajeSuspensos = function () {
+    if (!this.hayAlumnos()) return 0;
+    
+    let suspensos = 0;
+    for (let i = 0; i < this.alumnos.length; i++) {
+        if ((this.alumnos[i].notaFinal || 0) < 5) {
+            suspensos++;
+        }
+    }
+    return (suspensos / this.alumnos.length) * 100;
+};
+
+Aula.prototype.mostrarSuspensosAprobados = function () {
+    const pSuspensos = this.porcentajeSuspensos();
+    const pAprobados = 100 - pSuspensos;
+
+    return `Aprobados: ${pAprobados.toFixed(2)}%, Suspensos: ${pSuspensos.toFixed(2)}%`;
+};
+
+Aula.prototype.inicializarGestionGrupos = function (nombresGruposIniciales = ["Grupo 1" , "Grupo 2", "Grupo 3"]){
+  this._grupos = new Set(nombresGruposIniciales);
+  this._alumnosPorGrupo = new Map();
+  console.log("Gestion de grupos iniciada")
+
+};
