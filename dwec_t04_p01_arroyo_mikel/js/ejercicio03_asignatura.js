@@ -1,135 +1,87 @@
+// ===============================
+// Archivo: ejercicio03_asignaturas.js
+// ===============================
 
-const lengua2 = new Object({
-    curso: 2,
-    nombreAsignatura: "Lengua II",
-    tipo: "Obligatoria",
-    alumnos: []
-});
-
-const mates2 = new Object({
-    curso: 2,
-    nombreAsignatura: "Matemáticas II",
-    tipo: "Obligatoria",
-    alumnos: []
-});
+const lengua2 = { _curso: 2, _nombreAsignatura: "Lengua II", _tipo: "obligatoria", _alumnos: [] };
+const mates2 = { _curso: 2, _nombreAsignatura: "Matemáticas II", _tipo: "obligatoria", _alumnos: [] };
+const economia2 = { _curso: 2, _nombreAsignatura: "Economía", _tipo: "optativa", _alumnos: [] };
+const informatica2 = { _curso: 2, _nombreAsignatura: "Informática", _tipo: "optativa", _alumnos: [] };
 
 
-const economia2 = new Object({
-    curso: 2,
-    nombreAsignatura: "Economía",
-    tipo: "Optativa",
-    alumnos: []
-});
+const lengua3 = { _curso: 3, _nombreAsignatura: "Lengua III", _tipo: "obligatoria", _alumnos: [] };
+const mates3 = { _curso: 3, _nombreAsignatura: "Matemáticas III", _tipo: "obligatoria", _alumnos: [] };
+const dibujo3 = { _curso: 3, _nombreAsignatura: "Dibujo Técnico", _tipo: "optativa", _alumnos: [] };
+const musica3 = { _curso: 3, _nombreAsignatura: "Música", _tipo: "optativa", _alumnos: [] };
 
-const informatica2 = new Object({
-    curso: 2,
-    nombreAsignatura: "Informática",
-    tipo: "Optativa",
-    alumnos: []
-});
-
-const lengua3 = new Object({
-    curso: 3,
-    nombreAsignatura: "Lengua III",
-    tipo: "Obligatoria",
-    alumnos: []
-});
-
-const mates3 = new Object({
-    curso: 3,
-    nombreAsignatura: "Matemáticas III",
-    tipo: "Obligatoria",
-    alumnos: []
-});
-
-
-const dibujo3 = new Object({
-    curso: 3,
-    nombreAsignatura: "Dibujo Técnico",
-    tipo: "Optativa",
-    alumnos: []
-});
-
-const musica3 = new Object({
-    curso: 3,
-    nombreAsignatura: "Música",
-    tipo: "Optativa",
-    alumnos: []
-});
-
-function addGetterNombreAsignatura(obj){
-    Object.defineProperty(obj, "getNombreAsignatura", {
-        get: function(){
-            return this.nombreAsignatura;
-        },
-        enumerable: true,
-        configurable: true
-    });
-}
-
-function addGetterTipo(obj){
-    Object.defineProperty(obj, "getTipo", {
-        get: function(){
-            return this.tipo;
-        },
-        enumerable: true,
-        configurable: true
-    });
-}
-
-function addGetterCurso(obj){
-    Object.defineProperty(obj,"getCurso", {
-        get: function(){
-            return this.curso;
-        },
-        enumerable: true,
-        confirable: true
-    });
-}
-
-function addSetterNombreAsignatura(obj){
-    Object.defineProperty(obj, "setNombreAsignatura", {
-        set: function(v){
-            this.nombreAsignatura = String(v ?? "").trim();
-        },
-        enumerable: true,
-        configurable: true
-    });
-}
-
-function addSetterTipo(obj){
-    Object.defineProperty(obj, "setTipo", {
-        set: function(v){
-            this.tipo = String(v ?? "").trim();
-        },
-        enumerable: true,
-        configurable: true
-    });
-}
-
-function addSetterCurso(obj){
-    Object.defineProperty(obj, "setCurso", {
-        set: function(v){
-            const n = Number(v);
-            if ([1,2,3,4].includes(n)){
-                this.curso = n;
-            }
-        },
-        enumerable: true,
-        configurable: true
-    });
-}
-
-const asignaturas = [
-    lengua2, mates2, economia2, informatica2,
-    lengua3, mates3, dibujo3, musica3
+const Asignatura = [
+  lengua2, mates2, economia2, informatica2,
+  lengua3, mates3, dibujo3, musica3
 ];
 
-asignaturas.forEach(addGetterNombreAsignatura);
-asignaturas.forEach(addGetterTipo);
-asignaturas.forEach(addGetterCurso);
+// -----------------------------------------
+// Getters y setters para las propiedades
+// -----------------------------------------
 
-asignaturas.forEach(addSetterNombreAsignatura);
-asignaturas.forEach(addSetterTipo);
-asignaturas.forEach(addSetterCurso);
+function addGettersYSetters(obj) {
+  Object.defineProperty(obj, "nombreAsignatura", {
+    get: function () {
+      return this._nombreAsignatura;
+    },
+    set: function (v) {
+      this._nombreAsignatura = String(v ?? "").trim();
+    },
+    enumerable: true,
+    configurable: true
+  });
 
+  Object.defineProperty(obj, "tipo", {
+    get: function () {
+      return this._tipo;
+    },
+    set: function (v) {
+      this._tipo = String(v ?? "").trim().toLowerCase();
+    },
+    enumerable: true,
+    configurable: true
+  });
+
+  Object.defineProperty(obj, "curso", {
+    get: function () {
+      return this._curso;
+    },
+    set: function (v) {
+      const n = Number(v);
+      if ([1, 2, 3, 4].includes(n)) {
+        this._curso = n;
+      }
+    },
+    enumerable: true,
+    configurable: true
+  });
+
+  Object.defineProperty(obj, "alumnos", {
+    get: function() {
+      return this._alumnos;
+    },
+    set: function(v) {
+      if (Array.isArray(v)) this._alumnos = v;
+    },
+    enumerable: true,
+    configurable: true
+  });
+
+}
+
+
+
+Asignatura.forEach(addGettersYSetters);
+
+
+function mostrarInfo(asignatura) {
+  console.log(`Asignatura: ${asignatura.nombreAsignatura} (${asignatura.tipo}) - Curso ${asignatura.curso}`);
+}
+
+// Asigna un profesor (se reutilizará con call/apply más adelante)
+function asignarProfesor(asignatura, nombre, correo) {
+  console.log(`Profesor ${nombre} (${correo}) imparte ${asignatura.nombreAsignatura}`);
+}

@@ -1,14 +1,13 @@
 // ejercicio03_aula.js
 
-function Aula(maxAlumnos, id, descripcion, curso) {
+function Aula(id, descripcion, maxAlumnos, curso) {
   this._alumnos = [];
-  this._numAlumnos = 0;              // lo dejamos aunque no se usa, no molesta
-  this._maxAlumnos = maxAlumnos;
+  this._numAlumnos = 0;              
   this._id = id;
   this._descripcion = descripcion;
+  this._maxAlumnos = maxAlumnos;
   this._curso = curso;
 }
-
 
 
 Object.defineProperty(Aula.prototype, "alumnos", {
@@ -88,23 +87,23 @@ Object.defineProperty(Aula.prototype, "curso", {
 });
 
 
-// ¿Hay sitio para meter alumnos?
+
 Aula.prototype.haySitioAlumnos = function (cantidad) {
     const nuevos = parseFloat(cantidad) || 1; 
     return this.alumnos.length + nuevos <= this._maxAlumnos;
 };
 
-// ¿Hay alumnos en el aula?
+
 Aula.prototype.hayAlumnos = function () {
     return this.alumnos.length > 0;
 };
 
-// ¿Cuántas plazas libres quedan?
+
 Aula.prototype.obtenerSitiosAlumnos = function () {
     return this._maxAlumnos - this.alumnos.length;
 };
 
-// Insertar alumnos (array)
+
 Aula.prototype.insertarAlumnos = function (arrayAlumnos) {
     if (!Array.isArray(arrayAlumnos)) {
         console.warn("insertarAlumnos debe recibir un array.");
@@ -120,7 +119,6 @@ Aula.prototype.insertarAlumnos = function (arrayAlumnos) {
     }
 };
 
-// Insertar SOLO 1 alumno (muy útil para este ejercicio)
 Aula.prototype.insertarAlumno = function (alumno) {
     if (this.alumnos.length < this._maxAlumnos) {
         this.alumnos.push(alumno);

@@ -1,12 +1,12 @@
 // ejercicio03_alumno.js
 
-// Contador estático para IDs autoincrementados
+
 Alumno._contadorID = 1;
 
 function Alumno(nombre) {
-    this._id = Alumno._contadorID++;  // autoincrementa con cada alumno nuevo
+    this._id = Alumno._contadorID++;  
     this._nombre = nombre;
-    this._notas = {};  // ejemplo: { "Lengua II": 7.5 }
+    this._notas = {}; 
 }
 
 
@@ -14,7 +14,7 @@ Object.defineProperty(Alumno.prototype, "id", {
     get: function() {
         return this._id;
     }
-    // No hay setter → el ID no se puede modificar
+    
 });
 
 Object.defineProperty(Alumno.prototype, "nombre", {
@@ -43,4 +43,9 @@ Alumno.prototype.mostrarInformacion = function() {
     );
 };
 
+Alumno.pedirDatos = function() {
+    const nombre = prompt("Nombre del alumno:");
+    if (!nombre || nombre.trim()==="") return null;
+    return new Alumno(nombre.trim());
+};
 
