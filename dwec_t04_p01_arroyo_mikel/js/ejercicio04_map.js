@@ -160,6 +160,7 @@ const personajes = [
 
 function ejercicio1() {
     let nombres = personajes.map(elememtoArray => elememtoArray.nombre);
+    
     console.log("Nombres de todos los personajes:");
     console.log(nombres);
 }
@@ -186,11 +187,13 @@ function ejercicio2() {
 // con las claves: { personaje: nombre, poderPrincipal: superpoder, edad: edad }.
 
 function ejercicio3() {
-    let resumen = personajes.map(elementoArray => ({
-        personaje: elementoArray.nombre,
-        poderPrincipal: elementoArray.superpoder,
-        edad: elementoArray.edad
-    }));
+    let resumen = personajes.map(elementoArray => {
+        return {
+            personaje: elementoArray.nombre,
+            poderPrincipal: elementoArray.superpoder,
+            edad: elementoArray.edad
+        };
+    });
 
     console.log("Array de objetos resumen:");
     console.log(resumen);
@@ -204,7 +207,6 @@ function ejercicio3() {
 
 function ejercicio4() {
     let todosLosPoderes = personajes.flatMap(personaje => personaje.superpoder.split(", "));
-
 
     let todosLosPoderesMap = personajes.map(personaje => personaje.superpoder.split(", "));
 
