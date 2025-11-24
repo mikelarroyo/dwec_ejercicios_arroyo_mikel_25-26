@@ -2,16 +2,16 @@ console.log("T04 - Ejercicio 01");
 
 class Libro {
     static GENEROS_LITERARIOS = new Set([
-        "Novela",
-        "Poesia",
-        "Ensayo",
-        "Teatro",
-        "Ciencia ficcion",
-        "Fantasia",
-        "Historico",
-        "Biografia",
-        "Terror",
-        "Infantil",
+        "novela",
+        "poesia",
+        "ensayo",
+        "teatro",
+        "ciencia ficcion",
+        "fantasia",
+        "historico",
+        "biografia",
+        "terror",
+        "infantil",
     ]);
 
     #isbn;
@@ -22,12 +22,15 @@ class Libro {
     #precioOriginal;
 
     constructor(isbn, titulo, autoresArray, genero, precio) {
+        if (!Util.validarEntero(isbn) || !Util.esPositivoMayorQueCero(isbn)) {
+            throw new Error("ISBN inválido. Debe ser un entero positivo.");
+        }
         this.#isbn = Number(isbn);
         this.titulo = titulo;
         this.genero = genero;
         this.autores = autoresArray;
         this.precio = precio;
-        this.#precioOriginal = this.precio;
+        this.#precioOriginal = this.precio; // Usa el getter this.precio
     }
 
     get isbn() {
@@ -56,10 +59,10 @@ class Libro {
         this.#titulo = valor.trim();
     }
     set autores(lista) {
-        if (!Array.isArray(lista) || lista.length < 1) {
-            throw new Error("Debe haber al menos un autor.");
+        if (!Array.isArray(lista)) { 
+            throw new Error("Debe ser un array de autores.");
         }
-        this.#autores = lista;
+        this.#autores = lista; 
     }
     set genero(valor) {
         if (!Util.validarGenero(valor, Libro.GENEROS_LITERARIOS)) {
@@ -77,30 +80,52 @@ class Libro {
     mostrarDatosLibro() {
         return `
             LIBRO
-            - ISBN: ${this.#isbn}
-            - Título: ${this.#titulo}
-            - Género: ${this.#genero}
-            - Autores: ${this.#autores
-                .map((autores) => autores.nombreCompleto)
-                .join(",")}
-            - Precio actual (sin IVA): ${this.#precio.toFixed(2)} €
-            - Precio original: ${this.#precioOriginal.toFixed(2)} €
+            - ISBN: ${this.isbn}
+            - Título: ${this.titulo}
+            - Género: ${this.genero}
+            - Autores: ${this.autores
+                .map((autor) => autor.nombreCompleto)
+                .join(", ")}
+            - Precio actual (sin IVA): ${this.precio.toFixed(2)} €
+            - Precio original: ${this.precioOriginal.toFixed(2)} €
             `;
     }
 
     deshacerDescuentoLibro() {
-        this.#precio = this.#precioOriginal;
+        // Usa el setter y el getter
+        this.precio = this.precioOriginal; 
     }
 
     aplicarDescuentoLibro(porcentaje) {
-        if (!Util.validarReal(porcentaje) || porcentaje <= 0 || porcentaje > 100) {
+        if (!Util.validarPercentaje(porcentaje) || porcentaje === 0) {
             throw new Error("Descuento inválido");
         }
-        this.#precio = this.#precioOriginal;
-        const rebaja = this.#precio * (porcentaje / 100);
-        this.#precio = Number((this.#precio - rebaja).toFixed(2));
+        // Usa el setter y el getter
+        this.precio = this.precioOriginal; 
+        const rebaja = this.precio * (porcentaje / 100);
+        // Usa el setter
+        this.precio = Number((this.precio - rebaja).toFixed(2));
+    }
+    
+    modificarLibro(mapaInfo) {
+        for (const clave in mapaInfo) {
+            if (mapaInfo.hasOwnProperty(clave)) {
+                if (clave === 'isbn') {
+                    console.log("El ISBN no puede modificarse. Ignorado.");
+                    continue;
+                }
+                
+                try {
+                    // Asignación mediante setter (this[clave] = valor)
+                    this[clave] = mapaInfo[clave]; 
+                } catch (error) {
+                    console.log(`Advertencia: La propiedad '${clave}' no es modificable en Libro base o el valor es inválido.`);
+                }
+            }
+        }
     }
 }
+
 
 class Ebook extends Libro {
     #tamanioArchivo;
@@ -146,44 +171,36 @@ class Ebook extends Libro {
         if (!Util.validarFormato(nuevoFormato, Ebook.FORMATOS)) {
             throw new Error("Formato no válido");
         }
-        this.formato = nuevoFormato;
+        // Usa el setter
+        this.formato = nuevoFormato; 
     }
     mostrarDatosLibro() {
         return `${super.mostrarDatosLibro()}
-        - Tamanio Archivo: ${this.tamanioArchivo}
+        - Tamanio Archivo: ${this.tamanioArchivo} MB
         - Formato: ${this.formato}
         `;
     }
     comprobarDisponibilidad() {
         return true;
     }
-    modificarLibro(mapaInfo) {
-        if (mapaInfo.hasOwnProperty("isbn")) {
-            console.log("El ISBN no se puede modificar. Ignorado.");
-        }
-        if (mapaInfo.hasOwnProperty("titulo")) {
-            this.titulo = mapaInfo.titulo;
-        }
-        if (mapaInfo.hasOwnProperty("autores")) {
-            this.autores = mapaInfo.autores;
-        }
-        if (mapaInfo.hasOwnProperty("genero")) {
-            this.genero = mapaInfo.genero;
-        }
-        if (mapaInfo.hasOwnProperty("precio")) {
-            this.precio = mapaInfo.precio;
-        }
-
-        if (mapaInfo.hasOwnProperty("tamanioArchivo")) {
-            this.tamanioArchivo = mapaInfo.tamanioArchivo;
-        }
-
-        if (mapaInfo.hasOwnProperty("formato")) {
-            this.convertirFormato(mapaInfo.formato);
+    
+    modificarLibro(mapaInfo) { 
+        for (const clave in mapaInfo) {
+            if (mapaInfo.hasOwnProperty(clave)) {
+                if (clave === 'isbn') {
+                    console.log("El ISBN no se puede modificar. Ignorado.");
+                    continue;
+                }
+                
+                try {
+                    // Asignación mediante setter
+                    this[clave] = mapaInfo[clave];
+                } catch (error) {
+                    console.log(`Advertencia: No se pudo asignar '${clave}'. El valor es inválido o la propiedad no existe en Ebook.`);
+                }
+            }
         }
     }
-
-
 }
 
 class LibroPapel extends Libro {
@@ -202,7 +219,7 @@ class LibroPapel extends Libro {
         dimensiones,
         stock
     ) {
-        super(isbn, titulo, autoresArray, genero, precio, peso, dimensiones, stock);
+        super(isbn, titulo, autoresArray, genero, precio); 
         this.peso = peso;
         this.dimensiones = dimensiones;
         this.stock = stock;
@@ -210,6 +227,7 @@ class LibroPapel extends Libro {
     get peso() { return this.#peso };
     get dimensiones() { return this.#dimensiones };
     get stock() { return this.#stock };
+    
     set peso(valor) {
         if (!Util.validarPeso(valor)) {
             throw new Error("Peso inválido");
@@ -224,89 +242,66 @@ class LibroPapel extends Libro {
     }
     set stock(valor) {
         if (!Util.validarStock(valor)) {
-            throw new Error("Stock inválido");
+            throw new Error("Stock inválido"); 
         }
-        this.#stock = Numer(valor);
+        this.#stock = Number(valor); 
     }
+    
     embalar() {
         return "embalando...";
     }
+    
     reducirStock() {
-        if (this.#stock <= 0) {
+        // Usa el getter para leer, y el setter para escribir
+        if (this.stock <= 0) { 
             throw new Error("No hay stock suficiente para reducir.");
         }
-        this.#stock--;
+        this.stock = this.stock - 1; 
     }
 
     ampliarStock(numUnidades) {
-        if (!Util.validarStock(numUnidades) || numUnidades <= 0) {
+        if (!Util.validarEntero(numUnidades) || numUnidades <= 0) {
             throw new Error("Número de unidades inválido para ampliar stock.");
         }
-        this.#stock += numUnidades;
-
+        // Usa el setter y el getter
+        this.stock = this.stock + numUnidades; 
     }
+    
     avisoStockMinimo() {
-        if (this.#stock < LibroPapel.MINIMO_STOCK) {
-            return "Atención: Stock por debajo del mínimo.";
-        }
-        return "Stock suficiente";
-    }
-    mostrarDatosLibro() {
-        return `${super.mostrarDatosLibro()}
-            - Peso: ${this.peso} kg
-            - Dimensiones: ${this.dimensiones}
-            - Stock: ${this.stock}
-            `;
+        // Usa el getter
+        return this.stock < LibroPapel.MINIMO_STOCK; 
     }
 
     comprobarDisponibilidad() {
-        return this.#stock > 0;
+        // Usa el getter
+        return this.stock > 0; 
     }
 
-    // Sobrescribir mostrarDatosLibro()
     mostrarDatosLibro() {
         return `
         ${super.mostrarDatosLibro()}
+        - Peso: ${this.peso} kg
+        - Dimensiones: ${this.dimensiones}
         - Stock disponible: ${this.stock}
-        - ¿Necesita reposición?: ${this.stock < LibroPapel.MINIMO_STOCK ? "Sí" : "No"}
+        - ¿Necesita reposición?: ${this.avisoStockMinimo() ? "Sí" : "No"}
                 `;
     }
 
-    // Polimorfismo: modificarLibro()
     modificarLibro(mapaInfo) {
-
-        // El ISBN NO puede modificarse
-        if (mapaInfo.hasOwnProperty("isbn")) {
-            console.log("El ISBN no puede modificarse. Ignorado.");
-        }
-
-        // Título
-        if (mapaInfo.hasOwnProperty("titulo")) {
-            this.titulo = mapaInfo.titulo;
-        }
-
-        // Autores
-        if (mapaInfo.hasOwnProperty("autores")) {
-            this.autores = mapaInfo.autores;
-        }
-
-        // Género
-        if (mapaInfo.hasOwnProperty("genero")) {
-            this.genero = mapaInfo.genero;
-        }
-
-        // Precio
-        if (mapaInfo.hasOwnProperty("precio")) {
-            this.precio = mapaInfo.precio;
-        }
-
-        // Stock — solo en LibroPapel
-        if (mapaInfo.hasOwnProperty("stock")) {
-            this.stock = mapaInfo.stock;
+        for (const clave in mapaInfo) {
+            if (mapaInfo.hasOwnProperty(clave)) {
+                if (clave === 'isbn') {
+                    console.log("El ISBN no puede modificarse. Ignorado.");
+                    continue;
+                }
+                
+                try {
+                    // Asignación mediante setter
+                    this[clave] = mapaInfo[clave];
+                } catch (error) {
+                    console.log(`Advertencia: No se pudo asignar '${clave}'. El valor es inválido o la propiedad no existe en LibroPapel.`);
+                }
+            }
         }
     }
-
 }
-
-
-

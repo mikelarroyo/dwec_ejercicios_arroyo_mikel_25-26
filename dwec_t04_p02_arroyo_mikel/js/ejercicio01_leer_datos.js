@@ -1,6 +1,7 @@
 console.log("T04 - Ejercicio 01");
 
 class LeerDatos {
+    // Métodos abstractos (No se modifican)
     leerEntero(mensaje_o_id) {
         throw new Error("Método abstracto: leerEntero() debe ser implementado.");
     }
@@ -39,10 +40,20 @@ class LeerDatos {
 }
 
 class LeerDatosPrompt extends LeerDatos {
+
+    // --- MÉTODOS BÁSICOS (Lanzan excepción si son inválidos o se cancela) ---
+
     leerEntero(mensaje_o_id) {
         const texto = prompt(mensaje_o_id);
+
+        // 1. Comprobación de cancelación (null)
+        if (texto === null) {
+            throw new Error("Entrada cancelada por el usuario.");
+        }
+
         const num = Number(texto);
 
+        // 2. Comprobación de validación
         if (!Util.validarEntero(num)) {
             throw new Error("Debe introducir un número entero.");
         }
@@ -51,8 +62,15 @@ class LeerDatosPrompt extends LeerDatos {
 
     leerReal(mensaje_o_id) {
         const texto = prompt(mensaje_o_id);
+
+        // 1. Comprobación de cancelación (null)
+        if (texto === null) {
+            throw new Error("Entrada cancelada por el usuario.");
+        }
+
         const num = Number(texto);
 
+        // 2. Comprobación de validación
         if (!Util.validarReal(num)) {
             throw new Error("Debe introducir un número real.");
         }
@@ -60,6 +78,7 @@ class LeerDatosPrompt extends LeerDatos {
     }
 
     leerEnteroEntre(mensaje_o_id, min, max) {
+        // Llama a leerEntero, que ya maneja la cancelación y validación de entero
         const num = this.leerEntero(mensaje_o_id);
 
         if (num < min || num > max) {
@@ -68,74 +87,95 @@ class LeerDatosPrompt extends LeerDatos {
         return num;
     }
 
+    /**
+     * Lee una cadena. Longitud mínima es 1 por defecto.
+     */
     leerCadena(mensaje_o_id, longitud, patron) {
-    const texto = prompt(mensaje_o_id);
+        const texto = prompt(mensaje_o_id);
 
-    if (typeof texto !== "string") {
-        throw new Error("Debe introducir una cadena.");
-    }
-
-    const clean = texto.trim();
-
-    if (clean.length < longitud) {
-        throw new Error(`La cadena debe tener al menos ${longitud} caracteres.`);
-    }
-
-    if (!patron.test(clean)) {
-        throw new Error("La cadena no cumple el formato requerido.");
-    }
-
-    return clean;
-}
-
-    leerEnteroHasta(mensaje_o_id) {
-        let intentos = 0;
-        let num;
-
-        do {
-            const texto = prompt(mensaje_o_id);
-            num = Number(texto);
-            intentos++;
-        } while (!Util.validarEntero(num) && intentos < 10);
-
-        if (!Util.validarEntero(num)) {
-            throw new Error(
-                "Máximo de intentos alcanzado. No se introdujo un entero válido."
-            );
+        // 1. Comprobación de cancelación (null)
+        if (texto === null) {
+            throw new Error("Entrada cancelada por el usuario.");
         }
 
-        return num;
+        const clean = texto.trim();
+        // Determinar la longitud mínima (1 por defecto si no se proporciona)
+        const longitudMinima = (longitud !== undefined && longitud !== null) ? Number(longitud) : 1;
+
+        // 2. Validación de longitud mínima
+        if (clean.length < longitudMinima) {
+            throw new Error(`La cadena debe tener al menos ${longitudMinima} caracteres.`);
+        }
+
+        // 3. Validación de patrón (solo si se proporciona)
+        if (patron instanceof RegExp && !patron.test(clean)) {
+            throw new Error("La cadena no cumple el formato requerido.");
+        }
+
+        return clean;
+    }
+
+    // --- MÉTODOS REPETITIVOS (Usan do...while y try...catch) ---
+
+    leerEnteroHasta(mensaje_o_id) {
+        let resultado = null;
+        let valido = false;
+
+        do {
+            try {
+                // Llama al método base. Si es válido, asigna y establece valido=true.
+                resultado = this.leerEntero(mensaje_o_id);
+                valido = true;
+            } catch (error) {
+                // Propagamos cancelación inmediatamente
+                if (error.message.includes("cancelada")) {
+                    throw error;
+                }
+                // Si es por validación, mostramos mensaje y el bucle repite
+                console.log(`Error de validación: ${error.message}. Vuelva a intentar.`);
+            }
+        } while (!valido);
+
+        return resultado;
     }
 
     leerEnteroEntreHasta(mensaje_o_id, min, max) {
-        let intentos = 0;
-        let num;
+        let resultado = null;
+        let valido = false;
 
         do {
-            const texto = prompt(mensaje_o_id);
-            num = Number(texto);
-            intentos++;
-        } while (
-            (!Util.validarEntero(num) || num < min || num > max) &&
-            intentos < 10
-        );
+            try {
+                // Llama al método base. Si es válido, asigna y establece valido=true.
+                resultado = this.leerEnteroEntre(mensaje_o_id, min, max);
+                valido = true;
+            } catch (error) {
+                if (error.message.includes("cancelada")) {
+                    throw error;
+                }
+                console.log(`Error de validación: ${error.message}. Vuelva a intentar.`);
+            }
+        } while (!valido);
 
-        if (!Util.validarEntero(num) || num < min || num > max) {
-            throw new Error(
-                `Máximo de intentos alcanzado. No se introdujo un entero entre ${min} y ${max}.`
-            );
-        }
-
-        return num;
+        return resultado;
     }
 
-    leerCadenaHasta(mensaje_o_id) {
-    try {
-        return this.leerCadena(mensaje_o_id);
-    } catch (e) {
-        console.log(e.message);
-        return this.leerCadenaHasta(mensaje_o_id);
-    }
-}
+    leerCadenaHasta(mensaje_o_id, longitud, patron) {
+        let resultado = null;
+        let valido = false;
 
+        do {
+            try {
+                // Llama al método base. Si es válido, asigna y establece valido=true.
+                resultado = this.leerCadena(mensaje_o_id, longitud, patron);
+                valido = true;
+            } catch (error) {
+                if (error.message.includes("cancelada")) {
+                    throw error;
+                }
+                console.log(`Error de validación: ${error.message}. Vuelva a intentar.`);
+            }
+        } while (!valido);
+
+        return resultado;
+    }
 }
