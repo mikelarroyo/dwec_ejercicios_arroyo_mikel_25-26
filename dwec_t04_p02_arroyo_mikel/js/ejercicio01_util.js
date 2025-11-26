@@ -1,62 +1,203 @@
-class Cliente {
-    #dni;
-    #nombreCompleto;
-    #direccion;
-    #pedidos; 
+console.log("T04 - Ejercicio 01");
 
-    constructor(dni, nombreCompleto, direccion) {
-        this.dni = dni;
-        this.nombreCompleto = nombreCompleto;
-        this.direccion = direccion;
-
-        this.#pedidos = [];  
+class Util {
+    static validarEntero(valor) {
+        if (valor === null || valor === undefined || String(valor).trim() === "") return false;
+        const numero = Number(valor);
+        return Number.isInteger(numero);
     }
 
-
-    get dni() { return this.#dni; }
-    get nombreCompleto() { return this.#nombreCompleto; }
-    get direccion() { return this.#direccion; }
-    get pedidos() { return this.#pedidos; } 
-
-    set dni(valor) {
-        if (!Util.validarEntero(valor) || !Util.esPositivoMayorQueCero(valor)) {
-            throw new Error("El DNI debe ser un número entero positivo.");
-        }
-        this.#dni = Number(valor);
+    static validarReal(valor) {
+        if (valor === null || valor === undefined || String(valor).trim() === "") return false;
+        const numero = Number(valor);
+        return Number.isFinite(numero);
     }
 
-    set nombreCompleto(valor) {
-        if (!Util.validarNombrePersona(valor)) {
-            throw new Error("El nombre completo no es válido.");
-        }
-        this.#nombreCompleto = valor.trim();
+    static esPositivoMayorQueCero(valor) {
+        const num = Number(valor);
+        return Util.validarReal(num) && num > 0;
     }
 
-    set direccion(valor) {
-        if (!Util.validarDireccion(valor)) {
-            throw new Error("La dirección no es válida.");
+    static validarCadenaFecha(valor) {
+        if (typeof valor !== "string") return false;
+
+        valor = valor.trim();
+        if (valor === "") return false;
+
+        const partes = valor.split("-");
+        if (partes.length !== 3) return false;
+
+        let dia, mes, anio;
+
+        // Formato YYYY-M-D o YYYY-MM-DD
+        if (partes[0].length === 4) {
+            anio = Number(partes[0]);
+            mes = Number(partes[1]);
+            dia = Number(partes[2]);
+
+            // Formato D-M-YYYY o DD-MM-YYYY
+        } else if (partes[2].length === 4) {
+            dia = Number(partes[0]);
+            mes = Number(partes[1]);
+            anio = Number(partes[2]);
+        } else {
+            return false;
         }
-        this.#direccion = valor.trim();
+
+        if (
+            !Number.isInteger(dia) ||
+            !Number.isInteger(mes) ||
+            !Number.isInteger(anio)
+        ) {
+            return false;
+        }
+
+        // Crea el objeto Date. El mes es 0-indexado (mes - 1)
+        const fecha = new Date(anio, mes - 1, dia);
+
+        // Comprueba si la fecha es consistente (evita 30 de febrero, etc.)
+        return (
+            fecha.getFullYear() === anio &&
+            fecha.getMonth() === mes - 1 &&
+            fecha.getDate() === dia
+        );
     }
 
-    mostrarDatosCliente() {
-        return `DNI: ${this.#dni} | Nombre: ${this.#nombreCompleto} | Dirección: ${this.#direccion}`;
+    static validarFecha(valor) {
+        if (valor instanceof Date) {
+            return !Number.isNaN(valor.getTime());
+        }
+
+        if (typeof valor === "string") {
+            return Util.validarCadenaFecha(valor);
+        }
+
+        return false;
     }
 
-    mostrarPedidosClienteAbierto() {
-        if (this.#pedidos.length === 0) {
-            return "El cliente no tiene pedidos.";
+    static validarTitulo(titulo) {
+        return typeof titulo === "string" && titulo.trim().length >= 1;
+    }
+
+    static validarNombrePersona(nombre) {
+        if (typeof nombre !== "string") return false;
+        const limpio = nombre.trim();
+        if (limpio.length < 3) return false;
+        const patron = /^[a-zA-Z\s]+$/;
+        return patron.test(limpio);
+    }
+
+    static validarDireccion(direccion) {
+        if (typeof direccion !== "string") return false;
+        const limpio = direccion.trim();
+        if (limpio.length < 5) return false;
+        const patron = /^[A-Za-z0-9\s\.,\-ºª]+$/;
+        return patron.test(limpio);
+    }
+
+    static validarPrecio(precio) {
+        return Util.validarReal(precio) && Util.esPositivoMayorQueCero(precio);
+    }
+
+    static validarTamanoArchivo(tamanoArchivo) {
+        return Util.validarReal(tamanoArchivo) && Util.esPositivoMayorQueCero(tamanoArchivo);
+    }
+
+    static validarPeso(peso) {
+        return Util.validarReal(peso) && Util.esPositivoMayorQueCero(peso);
+    }
+    
+    static validarStock(stock) {
+        // Se asume que el stock debe ser > 0 para esta validación, como pide el enunciado.
+        return Util.validarEntero(stock) && Util.esPositivoMayorQueCero(stock);
+    }
+    
+    static validarDiasEnvio(dias) {
+        return Util.validarEntero(dias) && Util.esPositivoMayorQueCero(dias);
+    }
+
+    static validarDimensiones(cadenaDimensiones) {
+        if (typeof cadenaDimensiones !== "string") return false;
+
+        const limpio = cadenaDimensiones.toLowerCase().replace("cm", "").trim();
+        const partes = limpio.split("x");
+
+        if (partes.length !== 3) return false;
+
+        return partes.every((par) => Util.esPositivoMayorQueCero(par));
+    }
+
+    static esMesPromocion(fecha, array_meses_promocion) {
+
+        if (!Array.isArray(array_meses_promocion)) return false;
+        if (!Util.validarFecha(fecha)) return false;
+
+        let d;
+
+        if (typeof fecha === "string") {
+
+            const partes = fecha.split("-");
+            let dia, mes_num, anio; // Renombrado para claridad
+
+            // Determinar el orden basado en el formato validado
+            if (partes[0].length === 4) { // YYYY-M-D
+                anio = Number(partes[0]);
+                mes_num = Number(partes[1]);
+                dia = Number(partes[2]);
+            } else { // D-M-YYYY
+                dia = Number(partes[0]);
+                mes_num = Number(partes[1]);
+                anio = Number(partes[2]);
+            }
+
+            d = new Date(anio, mes_num - 1, dia);
+        }
+        else {
+            d = fecha;
         }
 
-        // Solo pedidos abiertos (estado = "abierto")
-        const abiertos = this.#pedidos.filter(p => p.estado === "abierto");
+        const mes_actual = d.getMonth() + 1; // Mes 1-12
 
-        if (abiertos.length === 0) {
-            return "El cliente no tiene pedidos abiertos.";
+        return array_meses_promocion.includes(mes_actual);
+    }
+
+    static validarFormato(formatoLeido, setFormatosValidos) {
+        // Asume que setFormatosValidos es un Set de cadenas
+        if (!(setFormatosValidos instanceof Set)) return false;
+        if (typeof formatoLeido !== "string") return false;
+        
+        const f = formatoLeido.toLowerCase().trim();
+        return setFormatosValidos.has(f);
+    }
+
+    static validarGenero(generoLeido, setGenerosValidos) {
+        // Asume que setGenerosValidos es un Set de cadenas
+        if (!(setGenerosValidos instanceof Set)) return false;
+        if (typeof generoLeido !== "string") return false;
+        
+        const g = generoLeido.toLowerCase().trim();
+        return setGenerosValidos.has(g);
+    }
+
+    static validarPercentaje(porcentaje) {
+        const num = Number(porcentaje);
+        return Util.validarReal(num) && num >= 0 && num <= 100;
+    }
+    
+    // Métodos de conversión (Mejoras)
+    static convertirEntero(valor) {
+        const num = Number(valor);
+        if (!Util.validarEntero(num)) {
+            return null; 
         }
-
-        return abiertos
-            .map(p => p.mostrarDatosPedido())
-            .join("\n");
+        return num;
+    }
+    
+    static convertirReal(valor) {
+        const num = Number(valor);
+        if (!Util.validarReal(num)) {
+            return null; 
+        }
+        return num;
     }
 }

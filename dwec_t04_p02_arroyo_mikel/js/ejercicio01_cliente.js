@@ -1,41 +1,87 @@
-console.log("T04 - Ejercicio 01");
+console.log("T04 - Ejercicio 01: Cliente");
 
-class Cliente{
-
+class Cliente {
+    // ===== Atributos Privados =====
     #dni;
-    #nommbreCompleto;
+    #nombreCompleto;
     #direccion;
-    #pedidos;
+    #pedidosCliente; // Array de referencias a objetos Pedido
 
-
-    constructor(dni,nombre,direccion){
-        this.dni=dni;
-        this.nombre=nombre;
-        this.direccion=direccion;
-        this.#pedidos= [];
-    }
-
-    get dni(){return this.#dni;}
-    get nombreCompleto(){return this.#nommbreCompleto;}
-    get direccion(){return this.#direccion;}
-    get pedidos(){return this.#pedidos;}
-    set dni(valor){
-        if(!Util.validarEntero(valor)||!Util.validarReal(valor)){
-            throw new Error("tiene que ser un numero entero");
+    // ===== Constructor =====
+    constructor(dni, nombreCompleto, direccion) {
+        // Validación inmutable del DNI (se hace directamente ya que no hay setter)
+        if (!Util.validarEntero(dni) || !Util.esPositivoMayorQueCero(dni)) {
+            throw new Error("DNI del cliente inválido. Debe ser un entero positivo.");
         }
-        dniLimpio=Number(valor);
-        this.#dni= dniLimpio.trim();
+        this.#dni = Number(dni);
+        this.#pedidosCliente = [];
+        this.nombreCompleto = nombreCompleto;
+        this.direccion = direccion;
     }
-    set nombre(valor){
-        if(!Util.validarNombrePersona(valor)|| !Util.vali)
+
+    get dni() {
+        return this.#dni;
+    }
+    get nombreCompleto() {
+        return this.#nombreCompleto;
+    }
+    get direccion() {
+        return this.#direccion;
+    }
+    get pedidosCliente() {
+        return this.#pedidosCliente; 
     }
     
+    set nombreCompleto(valor) {
+        if (!Util.validarNombrePersona(valor)) {
+            throw new Error("Nombre completo inválido. Mínimo 3 caracteres y solo letras/espacios.");
+        }
+        this.#nombreCompleto = valor.trim();
+    }
+
+    set direccion(valor) {
+        if (!Util.validarDireccion(valor)) {
+            throw new Error("Dirección inválida.");
+        }
+        this.#direccion = valor.trim();
+    }
 
 
+    mostrarDatosCliente() {
+        return `
+            CLIENTE
+            - DNI: ${this.dni}
+            - Nombre: ${this.nombreCompleto}
+            - Dirección: ${this.direccion}
+            - Pedidos realizados: ${this.pedidosCliente.length}
+        `;
+    }
 
-
-
-
-
-
+    mostrarPedidosClienteAbierto() {
+        // Usa el getter y filter()
+        const pedidosAbiertos = this.pedidosCliente.filter(pedido => pedido.abierto === true);
+        
+        if (pedidosAbiertos.length === 0) {
+            return `El cliente ${this.nombreCompleto} no tiene pedidos abiertos.`;
+        }
+        
+        let cadena = `--- Pedidos Abiertos de ${this.nombreCompleto} ---\n`;
+        
+        // Usa map para mostrar la información básica de cada pedido abierto
+        cadena += pedidosAbiertos.map(pedido => {
+            // Asume que la clase Pedido tiene un getter para id, fecha y precioTotalConEnvioConIVA
+            return `ID ${pedido.id} | Fecha: ${pedido.fecha.toLocaleDateString()} | Total: ${pedido.precioTotalConEnvioConIVA.toFixed(2)} €`;
+        }).join('\n');
+        
+        return cadena;
+    }
+    
+    /**
+     * Método auxiliar usado por la Tienda/Pedidos para añadir un nuevo pedido.
+     * @param {Pedido} pedido 
+     */
+    _agregarPedido(pedido) {
+        // Solo agrega si es una instancia válida (asumimos que la Tienda lo verifica)
+        this.pedidosCliente.push(pedido); 
+    }
 }
