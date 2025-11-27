@@ -38,19 +38,15 @@ class Clientes{
         const clienteEncontrado = this.listadoClientes.find(cliente => cliente.dni === dni);
         return clienteEncontrado; 
     }
-    borrarClientePorDNI(dniAborrar, pedidosSistema) {
+    borrarClientePorDNI(dniAborrar) {
         const dni = Number (dniAborrar);
         const indice = this.listadoClientes.findIndex(cliente => cliente.dni === dni);
+        
         if(indice === -1){
             console.log(`No se ha encontrado el cliente con DNI ${dni}`);
             return false;
         }   
-        const cliente = this.listadoClientes[indice];
-        if(typeof pedidosSistema !== 'undefined' && pedidosSistema.borrarPedidos){
-            const idsPedidos = cliente.pedidosCliente.map(pedido=>pedido.id);
-            pedidosSistema.borrarPedidos(idsPedidos);
-            console.log(`Pedidos asociados al cliente con DNI ${dni} eliminados del sistema de pedidos.`);
-        }
+        
         this.listadoClientes.splice(indice, 1);
         return true;
     }

@@ -1,156 +1,213 @@
-console.log("T04 - Ejercicio 01");
+console.log("T04 - Ejercicio 01: Pedido");
 
 class Pedido {
-    static #ultimoId = 0;
-    static obtenerSiguienteId() {
-        return ++this.#ultimoId;
-    }
-
+    
     #id;
     #cliente;
-    #librosPedido; 
-    #tipoEnvioPedido = null;
+    #librosPedido; // Clave: ISBN, Valor: {libro: Libro, unidades: number}
     #fecha;
-    #precioTotalSinEnvioSinIVA = 0;
-    #precioTotalConEnvioSinIVA = 0;
-    #precioTotalConEnvioConIVA = 0;
-    #descuento = 0;
-    #abierto = true;
+    #tipoEnvioPedido;
+    #precioTotalSinEnvioSinIVA;
+    #precioTotalConEnvioSinIVA;
+    #precioTotalConEnvioConIVA;
+    #descuento;
+    #abierto;
+    static #ultimoId = 0;
 
-    constructor(cliente) {
-        if (!cliente) throw new Error("Debe haber un cliente para crear un pedido.");
-        
-        this.#id = Pedido.obtenerSiguienteId();
-        this.#cliente = cliente;
-        this.#librosPedido = new Map();
-        this.#fecha = new Date();
+    static obtenerSiguienteId() {
+        Pedido.#ultimoId++;
+        return Pedido.#ultimoId;
     }
 
+    constructor(cliente) {
+        if (!(cliente instanceof Cliente)) {
+            throw new Error("El pedido debe tener un cliente válido.");
+        }
+
+        this.#id = Pedido.obtenerSiguienteId();
+        this.#cliente = cliente;
+        this.#librosPedido = new Map(); 
+        this.#fecha = new Date();
+        this.#tipoEnvioPedido = null;
+        this.#precioTotalSinEnvioSinIVA = 0;
+        this.#precioTotalConEnvioSinIVA = 0;
+        this.#precioTotalConEnvioConIVA = 0;
+        this.#descuento = 0;
+        this.#abierto = true;
+        
+        // Llamada al método del cliente para asginarlo.
+        this.#cliente.agregarPedido(this); 
+    }
+
+    get id() { return this.#id; }
+    get cliente() { return this.#cliente; }
+    get librosPedido() { return this.#librosPedido; }
+    get fecha() { return this.#fecha; }
+    get tipoEnvioPedido() { return this.#tipoEnvioPedido; }
+    get precioTotalSinEnvioSinIVA() { return this.#precioTotalSinEnvioSinIVA; }
+    get precioTotalConEnvioSinIVA() { return this.#precioTotalConEnvioSinIVA; }
+    get precioTotalConEnvioConIVA() { return this.#precioTotalConEnvioConIVA; }
+    get descuento() { return this.#descuento; }
+    get abierto() { return this.#abierto; }
+
+    set abierto(valor) {
+        if (typeof valor === "boolean") {
+            this.#abierto = valor;
+        }
+    }
     hayLibros() {
-        return this.#librosPedido.size > 0;
+        return this.librosPedido.size > 0;
+    }
+    mostrarDatosPedido() { 
+        this.calcularTotal();
+
+        // **USANDO GETTERS**
+        let info = `PEDIDO #${this.id}\n`;
+        info += `Cliente: ${this.cliente.nombreCompleto}\n`;
+        info += `Fecha: ${this.fecha.toLocaleDateString()}\n`;
+        info += `Estado: ${this.abierto ? "Abierto" : "Cerrado"}\n`;
+        
+        info += `--- Libros ---\n`;
+        
+        // **USANDO GETTER**
+        for (const item of this.librosPedido.values()) {
+            const libro = item.libro;
+            const unidades = item.unidades;
+            
+            const tipo = (libro instanceof Ebook) ? "Ebook" : "Papel";
+            const precio = libro.precio.toFixed(2);
+            info += `- ${libro.titulo} (${tipo}) x${unidades} (${precio}€/u)\n`; 
+        }
+
+        // **USANDO GETTER**
+        const envioNombre = this.tipoEnvioPedido ? this.tipoEnvioPedido.nombre : "Sin envío";
+        info += `\nEnvío: ${envioNombre}\n`;
+        info += `Total sin IVA: ${this.precioTotalConEnvioSinIVA.toFixed(2)}€\n`;
+        info += `Total con IVA: ${this.precioTotalConEnvioConIVA.toFixed(2)}€\n`;
+
+        return info;
     }
 
     insertarLibro(libro, unidades) {
-        if (!libro) throw new Error("Libro no válido.");
-        if (!Util.validarEntero(unidades) || unidades <= 0)
-            throw new Error("Unidades no válidas.");
-
-        // Los ebooks siempre son 1 unidad
-        if (libro.tipo === "ebook") unidades = 1;
-
-        // Si ya existe
-        if (this.#librosPedido.has(libro.isbn)) {
-            if (libro.tipo === "ebook")
-                throw new Error("Un ebook solo puede añadirse una vez.");
-
-            const actuales = this.#librosPedido.get(libro.isbn);
-            this.#librosPedido.set(libro.isbn, actuales + unidades);
-        } else {
-            this.#librosPedido.set(libro.isbn, unidades);
+        if (!(libro instanceof Libro)) {
+            throw new Error("El objeto no es un libro válido.");
         }
 
-        let total = 0;
-        for (let u of this.#librosPedido.values()) total += u;
-        return total;
+        let cant = Number(unidades);
+        if (!Number.isInteger(cant) || cant <= 0) {
+            throw new Error("Las unidades deben ser un entero positivo.");
+        }
+        
+        const isbn = libro.isbn;
+
+        if (libro instanceof Ebook) {
+            if (cant !== 1) {
+                throw new Error("Los Ebooks solo se pueden comprar de 1 en 1.");
+            }
+            // **USANDO GETTER**
+            if (this.librosPedido.has(isbn)) {
+                throw new Error("Este Ebook ya está en el pedido.");
+            }
+            this.#librosPedido.set(isbn, { libro: libro, unidades: cant });
+
+        } else { 
+            // **USANDO GETTER**
+            const itemActual = this.librosPedido.get(isbn);
+            if (itemActual) {
+                itemActual.unidades += cant;
+                this.#librosPedido.set(isbn, itemActual);
+            } else {
+                this.#librosPedido.set(isbn, { libro: libro, unidades: cant });
+            }
+        }
+        
+        let totalUnidades = 0;
+        // **USANDO GETTER**
+        for (const item of this.librosPedido.values()) {
+            totalUnidades += item.unidades;
+        }
+        return totalUnidades;
     }
-    establecerTipoEnvio(tipoEnvio) {
-        if (!tipoEnvio) return false;
-        let hayPapel = false;
+
+    establecerTipoEnvio(tipoEnvio) { 
+        if (!(tipoEnvio instanceof TipoEnvio)) {
+            throw new Error("El tipo de envío no es válido.");
+        }
         let pesoTotal = 0;
+        let hayPapel = false;
+        for (const item of this.librosPedido.values()) {
+            const libro = item.libro;
+            const unidades = item.unidades;
 
-        for (let [isbn, unidades] of this.#librosPedido.entries()) {
-            const libro = this.#cliente.tienda.buscarLibroPorIsbn(isbn);
-
-            if (libro.tipo === "papel") {
+            if (libro instanceof LibroPapel) {
                 hayPapel = true;
-                pesoTotal += libro.peso * unidades;
+                pesoTotal += (libro.peso * unidades);
             }
         }
 
-        // Si NO hay papel → no se puede poner envío
-        if (!hayPapel) return false;
-        if (pesoTotal > tipoEnvio.pesoMaximo)
-            throw new Error("El peso supera el máximo permitido.");
+        if (!hayPapel) {
+
+            this.#tipoEnvioPedido = null;
+            return false;
+        }
+
+        if (pesoTotal > tipoEnvio.pesoMax) { 
+            throw new Error(`El peso (${pesoTotal}kg) supera el máximo permitido (${tipoEnvio.pesoMax}kg).`);
+        }
 
         this.#tipoEnvioPedido = tipoEnvio;
         return true;
     }
 
-    calcularTotal() {
+    calcularTotal() { 
         let totalLibros = 0;
+        const mesActual = this.fecha.getMonth(); 
+        const esPromocion = (mesActual === 10 || mesActual === 11);
+        for (const item of this.librosPedido.values()) {
+            const libro = item.libro;
+            const unidades = item.unidades;
 
-        // Descuento automático en noviembre/diciembre
-        const mes = this.#fecha.getMonth() + 1;
-        const aplicarDescuentoAuto = (mes === 11 || mes === 12);
-
-        // Calcular precio de todos los libros
-        for (let [isbn, unidades] of this.#librosPedido.entries()) {
-            const libro = this.#cliente.tienda.buscarLibroPorIsbn(isbn);
-            let precioLibro = libro.precio;
-
-            if (aplicarDescuentoAuto) {
-                precioLibro = precioLibro * 0.90; // 10% menos
+            let precio = libro.precio;
+            if (esPromocion) {
+                precio = precio * 0.90;
             }
-
-            totalLibros += precioLibro * unidades;
+            totalLibros += (precio * unidades);
         }
 
         this.#precioTotalSinEnvioSinIVA = totalLibros;
+        if (this.descuento > 0) {
+            const rebaja = this.#precioTotalSinEnvioSinIVA * (this.descuento / 100);
+            this.#precioTotalSinEnvioSinIVA -= rebaja;
+        }
 
-        // Calcular si hay envío
         let costeEnvio = 0;
-        let hayPapel = false;
-
-        for (let [isbn] of this.#librosPedido.entries()) {
-            const libro = this.#cliente.tienda.buscarLibroPorIsbn(isbn);
-            if (libro.tipo === "papel") hayPapel = true;
+        if (this.tipoEnvioPedido) {
+            let hayPapel = false;
+            for (const item of this.librosPedido.values()) {
+                if (item.libro instanceof LibroPapel) {
+                    hayPapel = true;
+                    break;
+                }
+            }
+            
+            if (hayPapel) {
+                costeEnvio = this.tipoEnvioPedido.precio;
+            }
         }
 
-        if (hayPapel && this.#tipoEnvioPedido) {
-            costeEnvio = this.#tipoEnvioPedido.precioEnvio;
-        }
-        this.#precioTotalConEnvioSinIVA = totalLibros + costeEnvio;
-        this.#precioTotalConEnvioConIVA = (totalLibros + costeEnvio) * 1.21;
+        this.#precioTotalConEnvioSinIVA = this.#precioTotalSinEnvioSinIVA + costeEnvio;
+        this.#precioTotalConEnvioConIVA = this.#precioTotalConEnvioSinIVA * 1.21;
+        this.#precioTotalConEnvioConIVA = Number(this.#precioTotalConEnvioConIVA.toFixed(2));
     }
-    aplicarDescuento(porcentaje) {
-        const factor = porcentaje / 100;
-        const descuento = this.#precioTotalSinEnvioSinIVA * factor;
-        this.#descuento = descuento;
-        const subtotalDescuento = this.#precioTotalSinEnvioSinIVA - descuento;
-        let costeEnvio = 0;
-        let hayPapel = false;
-        for (let [isbn] of this.#librosPedido.entries()) {
-            const libro = this.#cliente.tienda.buscarLibroPorIsbn(isbn);
-            if (libro.tipo === "papel") hayPapel = true;
+
+
+    aplicarDescuento(porcentaje) { 
+        const desc = Number(porcentaje);
+        if (isNaN(desc) || desc < 0 || desc > 100) {
+            return false;
         }
-        if (hayPapel && this.#tipoEnvioPedido) {
-            costeEnvio = this.#tipoEnvioPedido.precioEnvio;
-        }
-        this.#precioTotalConEnvioSinIVA = subtotalDescuento + costeEnvio;
-        this.#precioTotalConEnvioConIVA = (subtotalDescuento + costeEnvio) * 1.21;
+        this.#descuento = desc;
+        this.calcularTotal();
         return true;
-    }
-
-    // -------------------------------------------------------
-    // Mostrar datos del pedido
-    // -------------------------------------------------------
-    mostrarDatosPedido() {
-        let salida = `PEDIDO ${this.#id}\n`;
-        salida += `Fecha: ${this.#fecha.toLocaleDateString()}\n`;
-        salida += `Cliente: ${this.#cliente.nombre}\n\n`;
-        salida += "Libros:\n";
-
-        for (let [isbn, unidades] of this.#librosPedido.entries()) {
-            const libro = this.#cliente.tienda.buscarLibroPorIsbn(isbn);
-            salida += ` - ${libro.titulo} (${libro.tipo}) x${unidades}\n`;
-        }
-
-        salida += `\nTipo de envío: ${this.#tipoEnvioPedido ? this.#tipoEnvioPedido.nombre : "No aplica"}\n`;
-        salida += `Total sin envío (sin IVA): ${this.#precioTotalSinEnvioSinIVA.toFixed(2)}€\n`;
-        salida += `Descuento aplicado: ${this.#descuento.toFixed(2)}€\n`;
-        salida += `Total con envío (sin IVA): ${this.#precioTotalConEnvioSinIVA.toFixed(2)}€\n`;
-        salida += `Total final con IVA: ${this.#precioTotalConEnvioConIVA.toFixed(2)}€\n`;
-
-        return salida;
     }
 }

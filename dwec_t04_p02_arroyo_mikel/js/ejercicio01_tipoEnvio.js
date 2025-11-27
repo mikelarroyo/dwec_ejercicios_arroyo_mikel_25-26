@@ -5,10 +5,10 @@ class TipoEnvio {
     #precio;
 
     constructor(nombre, diasMax, pesoMax, precio) {
-        this.nombre = nombre;     // Setter
-        this.diasMax = diasMax;   // Setter
-        this.pesoMax = pesoMax;   // Setter
-        this.precio = precio;     // Setter
+        this.nombre = nombre;     
+        this.diasMax = diasMax;   
+        this.pesoMax = pesoMax; 
+        this.precio = precio;    
     }
 
     get nombre() { return this.#nombre; }

@@ -55,7 +55,6 @@ class Util {
         // Crea el objeto Date. El mes es 0-indexado (mes - 1)
         const fecha = new Date(anio, mes - 1, dia);
 
-        // Comprueba si la fecha es consistente (evita 30 de febrero, etc.)
         return (
             fecha.getFullYear() === anio &&
             fecha.getMonth() === mes - 1 &&
@@ -108,7 +107,7 @@ class Util {
     }
     
     static validarStock(stock) {
-        // Se asume que el stock debe ser > 0 para esta validación, como pide el enunciado.
+
         return Util.validarEntero(stock) && Util.esPositivoMayorQueCero(stock);
     }
     
@@ -137,10 +136,8 @@ class Util {
         if (typeof fecha === "string") {
 
             const partes = fecha.split("-");
-            let dia, mes_num, anio; // Renombrado para claridad
-
-            // Determinar el orden basado en el formato validado
-            if (partes[0].length === 4) { // YYYY-M-D
+            let dia, mes_num, anio;
+            if (partes[0].length === 4) { 
                 anio = Number(partes[0]);
                 mes_num = Number(partes[1]);
                 dia = Number(partes[2]);
@@ -162,7 +159,6 @@ class Util {
     }
 
     static validarFormato(formatoLeido, setFormatosValidos) {
-        // Asume que setFormatosValidos es un Set de cadenas
         if (!(setFormatosValidos instanceof Set)) return false;
         if (typeof formatoLeido !== "string") return false;
         
@@ -171,7 +167,6 @@ class Util {
     }
 
     static validarGenero(generoLeido, setGenerosValidos) {
-        // Asume que setGenerosValidos es un Set de cadenas
         if (!(setGenerosValidos instanceof Set)) return false;
         if (typeof generoLeido !== "string") return false;
         
@@ -184,7 +179,6 @@ class Util {
         return Util.validarReal(num) && num >= 0 && num <= 100;
     }
     
-    // Métodos de conversión (Mejoras)
     static convertirEntero(valor) {
         const num = Number(valor);
         if (!Util.validarEntero(num)) {

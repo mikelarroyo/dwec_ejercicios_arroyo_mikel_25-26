@@ -8,7 +8,6 @@ class Pedidos {
         this.#listadoPedidos = [];
     }
 
-
     existePedidoPorID(idAbuscar) {
         return this.#listadoPedidos.some(p => p.id === idAbuscar);
     }
@@ -21,8 +20,6 @@ class Pedidos {
 
         for (let p of pedidos) {
             if (!p) continue;
-
-            // No modificar pedidos existentes
             if (!this.existePedidoPorID(p.id)) {
                 this.#listadoPedidos.push(p);
                 insertados++;
@@ -38,7 +35,7 @@ class Pedidos {
         }
         return null;
     }
-
+    
     cerrarPedidoPorId(idAbuscar) {
         const pedido = this.buscarPedidoPorId(idAbuscar);
 
@@ -54,7 +51,7 @@ class Pedidos {
 
         for (let pedido of pedidosAborrar) {
             const indice = this.#listadoPedidos.findIndex(p => p.id === pedido.id);
-            if (indice === -1) return false; // Si uno falla → false total
+            if (indice === -1) return false; 
         }
 
         for (let pedido of pedidosAborrar) {

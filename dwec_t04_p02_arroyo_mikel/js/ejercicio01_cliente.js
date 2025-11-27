@@ -9,7 +9,6 @@ class Cliente {
 
     // ===== Constructor =====
     constructor(dni, nombreCompleto, direccion) {
-        // Validación inmutable del DNI (se hace directamente ya que no hay setter)
         if (!Util.validarEntero(dni) || !Util.esPositivoMayorQueCero(dni)) {
             throw new Error("DNI del cliente inválido. Debe ser un entero positivo.");
         }
@@ -75,13 +74,12 @@ class Cliente {
         
         return cadena;
     }
-    
-    /**
-     * Método auxiliar usado por la Tienda/Pedidos para añadir un nuevo pedido.
-     * @param {Pedido} pedido 
-     */
-    _agregarPedido(pedido) {
-        // Solo agrega si es una instancia válida (asumimos que la Tienda lo verifica)
-        this.pedidosCliente.push(pedido); 
+
+    agregarPedido(pedido) {
+        if (typeof Pedido === 'undefined' || !(pedido instanceof Pedido)) {
+            throw new Error("Solo se pueden agregar instancias de Pedido.");
+        }
+        this.#pedidosCliente.push(pedido);
+        return this.#pedidosCliente.length;
     }
 }
