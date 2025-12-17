@@ -12,8 +12,6 @@ Usa console.table() para mostrar listas de números.
 let num1 = Number(prompt("Escribe un numero"))
 let num2 = Number(prompt("Escrube otro numero"))
 
-
-
 function calcular_menor(a,b){
     return a < b? a : b;
 }
@@ -31,3 +29,4 @@ for (let i = menor; i <= mayor; i++){
 console.table(obj);
 console.log("Cantidad de numero: " + contador);
 alert("cantidad de nuemeros: " + contador);
+

@@ -1,0 +1,29 @@
+extends layout
+
+block main
+    h2.h5.mb-3 Catálogo de libros
+    table.table.table-striped#tablaLibros
+        thead
+            tr
+                th ISBN
+                th Título
+                th Autor
+                th Género
+                th Precio
+                th Tipo
+                th Stock
+                th
+        tbody
+    div.mb-3
+    input#inputBusqueda.form-control(type="text" placeholder="Buscar por título...")
+    #modalDetalles.modal.fade(tabindex="-1" aria-hidden="true")
+        .modal-dialog.modal-lg
+            .modal-content
+                .modal-header
+                    h5#modalTitulo.modal-title Detalles del Libro
+                    button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+                .modal-body
+                    #modalContenido
+                        // Aquí el JS inyectará los datos
+                .modal-footer
+                    button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cerrar

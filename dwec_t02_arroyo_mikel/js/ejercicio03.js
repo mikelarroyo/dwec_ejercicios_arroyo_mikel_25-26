@@ -16,17 +16,16 @@ Usa el depurador para ejecutar el script paso a paso y haz estas pruebas:
 //LET YEAR = d.get(FullYear); te lo devuelve con cuatro digitos.ç
 //si queremos hacer que vuelva a preguntar al usuario hacemos un do while para hacerlo
 let anio = parseInt(prompt("Escribe un año entre el 0 y el año actual"));
-    if(anio>=0 && anio<=2025){
-        if ((anio % 4 == 0 && anio % 100 !== 0) || (anio % 400 == 0)) {
-            alert("El año es bisiesto");
-            console.log("El año es bisiesto")
-        } else {
-            alert("El año no es bisiesto");
-        }
-
+if (anio >= 0 && anio <= 2025) {
+    if ((anio % 4 == 0 && anio % 100 !== 0) || (anio % 400 == 0)) {
+        alert("El año es bisiesto");
+        console.log("El año es bisiesto")
+    } else {
+        alert("El año no es bisiesto");
     }
-    else{
-        alert("El numero no esta entre el 0 y el año actual")
-    }
+}
+else {
+    alert("El numero no esta entre el 0 y el año actual")
+}
 
 

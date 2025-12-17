@@ -1,0 +1,48 @@
+doctype html
+html(lang="es")
+head
+meta(charset="UTF-8")
+meta(name="viewport", content="width=device-width, initial-scale=1.0")
+title #{title}
+
+// Bootstrap CSS
+link(
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css",
+    rel="stylesheet"
+)
+
+body
+include navbar.pug
+
+main.container.my-4
+    block main
+
+include footer.pug
+
+// Bootstrap JS
+script(
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+)
+
+
+script(src="../js/ejercicio01_util.js")
+script(src="../js/ejercicio01_leer_datos.js")
+script(src="../js/ejercicio3_leerDatosForm.js")
+
+script(src="../js/ejercicio01_autor.js")
+script(src="../js/ejercicio01_autores.js")
+
+script(src="../js/ejercicio01_libro.js")
+script(src="../js/ejercicio01_libros.js")
+
+script(src="../js/ejercicio01_cliente.js")
+script(src="../js/ejercicio01_clientes.js")
+
+script(src="../js/ejercicio01_pedido.js")
+script(src="../js/ejercicio01_pedidos.js")
+
+script(src="../js/ejercicio01_tipoEnvio.js")
+script(src="../js/ejercicio01_tipoEnvios.js")
+
+script(src="../js/ejercicio01_tienda.js")
+script(src="../js/ejercicio01_dom.js")

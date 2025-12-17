@@ -4,7 +4,7 @@ class Pedido {
     
     #id;
     #cliente;
-    #librosPedido; // Clave: ISBN, Valor: {libro: Libro, unidades: number}
+    #librosPedido;
     #fecha;
     #tipoEnvioPedido;
     #precioTotalSinEnvioSinIVA;
