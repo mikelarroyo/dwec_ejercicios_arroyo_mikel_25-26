@@ -1,32 +1,30 @@
 extends layout
 
 block main
-    h2.h5.mb-3 Catálogo de libros
-    .row.mb-3
-        .col-md-6.col-lg-4
-            .input-group
-                input#inputBusqueda.form-control(type="text" placeholder="Buscar por título...")
-                button#btnBuscar.btn.btn-primary(type="button") Buscar
-    .table-responsive
-        table.table.table-striped#tablaLibros
-            thead
-                tr
-                    th ISBN
-                    th Título
-                    th Autor
-                    th Género
-                    th Precio
-                    th Tipo
-                    th Stock
-                    th Acciones
-            tbody
-    #modalDetalles.modal.fade(tabindex="-1" aria-hidden="true")
-        .modal-dialog.modal-lg
+    h2 Catálogo de Libros
+
+    .mb-3
+        input#inputBusqueda.form-control.d-inline-block.w-auto(type="text" placeholder="Título...")
+        button#btnBuscar.btn.btn-primary.ms-2 Buscar
+    table#tablaLibros.table.table-hover
+        thead
+            tr
+                th ISBN
+                th Título
+                th Autor
+                th Género
+                th Precio
+                th Tipo
+                th Stock
+                th Acciones
+        tbody
+
+    #modalDetalles.modal.fade
+        .modal-dialog
             .modal-content
                 .modal-header
-                    h5#modalTitulo.modal-title Detalles del Libro
-                    button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
-                .modal-body
-                    #modalContenido
+                    h5#modalTitulo.modal-title
+                    button.btn-close(data-bs-dismiss="modal")
+                .modal-body#modalContenido
                 .modal-footer
-                    button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cerrar
+                    button.btn.btn-secondary(data-bs-dismiss="modal") Cerrar
