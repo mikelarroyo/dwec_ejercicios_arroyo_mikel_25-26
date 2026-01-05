@@ -2,20 +2,24 @@ extends layout
 
 block main
     h2.h5.mb-3 Catálogo de libros
-    table.table.table-striped#tablaLibros
-        thead
-            tr
-                th ISBN
-                th Título
-                th Autor
-                th Género
-                th Precio
-                th Tipo
-                th Stock
-                th
-        tbody
-    div.mb-3
-    input#inputBusqueda.form-control(type="text" placeholder="Buscar por título...")
+    .row.mb-3
+        .col-md-6.col-lg-4
+            .input-group
+                input#inputBusqueda.form-control(type="text" placeholder="Buscar por título...")
+                button#btnBuscar.btn.btn-primary(type="button") Buscar
+    .table-responsive
+        table.table.table-striped#tablaLibros
+            thead
+                tr
+                    th ISBN
+                    th Título
+                    th Autor
+                    th Género
+                    th Precio
+                    th Tipo
+                    th Stock
+                    th Acciones
+            tbody
     #modalDetalles.modal.fade(tabindex="-1" aria-hidden="true")
         .modal-dialog.modal-lg
             .modal-content
@@ -24,6 +28,5 @@ block main
                     button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
                 .modal-body
                     #modalContenido
-                        // Aquí el JS inyectará los datos
                 .modal-footer
                     button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cerrar

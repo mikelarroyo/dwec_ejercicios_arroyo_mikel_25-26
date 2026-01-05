@@ -1,0 +1,60 @@
+extends layout
+
+block main
+    h2.h5.mb-3 Gestión de Libros
+    .card.mb-4
+        .card-header.bg-primary.text-white Registrar Nuevo Libro
+        .card-body
+            form#formLibro.needs-validation(novalidate)
+                .row.g-3
+                    .col-md-3
+                        label.form-label(for="isbn") ISBN
+                        input#isbn.form-control(type="number" required)
+                        .invalid-feedback#isbn-error El ISBN debe ser único.
+                    .col-md-5
+                        label.form-label(for="titulo") Título
+                        input#titulo.form-control(type="text" required)
+                    .col-md-4
+                        label.form-label(for="genero") Género
+                        input#genero.form-control(type="text" required)
+                
+                .row.g-3.mt-2
+                    .col-md-4
+                        label.form-label(for="precio") Precio (s/ IVA)
+                        input#precio.form-control(type="number" step="0.01" required)
+                    .col-md-4
+                        label.form-label(for="tipoLibro") Formato
+                        select#tipoLibro.form-select(required)
+                            option(value="papel" selected) Libro Papel
+                            option(value="ebook") Ebook
+                    .col-md-4
+                        label.form-label(for="autoresSelect") Autores (Ctrl+clic)
+                        select#autoresSelect.form-select(multiple required size="3")
+                            //- Se llenará dinámicamente con JS
+
+                //- CAMPOS DINÁMICOS 
+                #camposPapel.row.g-3.mt-2
+                    .col-md-4
+                        label.form-label(for="stock") Stock Inicial
+                        input#stock.form-control(type="number" value="0")
+                    .col-md-4
+                        label.form-label(for="peso") Peso (kg)
+                        input#peso.form-control(type="number" step="0.1")
+                    .col-md-4
+                        label.form-label(for="dimensiones") Dimensiones
+                        input#dimensiones.form-control(type="text" placeholder="20x15x3")
+
+                #camposEbook.row.g-3.mt-2.d-none
+                    .col-md-6
+                        label.form-label(for="tamanio") Tamaño (MB)
+                        input#tamanio.form-control(type="number" step="0.1")
+                    .col-md-6
+                        label.form-label(for="formato") Formato Archivo
+                        select#formato.form-select
+                            option(value="pdf") PDF
+                            option(value="epub") EPUB
+                            option(value="mobi") MOBI
+
+                .mt-4
+                    button.btn.btn-success(type="submit") Guardar Libro
+                    button.btn.btn-secondary.ms-2(type="reset") Limpiar

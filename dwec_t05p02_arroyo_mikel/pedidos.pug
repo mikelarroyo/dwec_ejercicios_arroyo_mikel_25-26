@@ -1,0 +1,71 @@
+extends layout
+
+block main
+    h2.h5.mb-3 Creación de Pedidos
+    #acordeonPedido.accordion
+        //- ACORDEÓN 1: SELECCIÓN DE CLIENTE
+        .accordion-item
+            h2.accordion-header#headerCliente
+                button.accordion-button(type="button" data-bs-toggle="collapse" data-bs-target="#collapseCliente") 1. Selección de Cliente
+            #collapseCliente.accordion-collapse.collapse.show(data-bs-parent="#acordeonPedido")
+                .accordion-body
+                    .input-group.mb-3
+                        input#dniBusquedaPedido.form-control(type="text" placeholder="DNI del cliente...")
+                        button#btnBuscarCliente.btn.btn-primary(type="button") Buscar Cliente
+                    #infoClienteSeleccionado.alert.alert-info.d-none
+                        span Cliente: 
+                        strong#nombreClienteActivo 
+                        button#btnDesmarcarCliente.btn.btn-sm.btn-outline-danger.ms-3(type="button") Deseleccionar
+
+        //- ACORDEÓN 2: AÑADIR LIBROS (Deshabilitado por defecto)
+        .accordion-item
+            h2.accordion-header#headerLibros
+                button#btnAcordeonLibros.accordion-button.collapsed(type="button" data-bs-toggle="collapse" data-bs-target="#collapseLibros" disabled) 2. Añadir Libros al Pedido
+            #collapseLibros.accordion-collapse.collapse(data-bs-parent="#acordeonPedido")
+                .accordion-body
+                    .row.g-3
+                        .col-md-6
+                            .input-group
+                                input#isbnBusquedaPedido.form-control(type="text" placeholder="ISBN del libro...")
+                                button#btnBuscarLibroPedido.btn.btn-secondary(type="button") Buscar
+                        .col-md-6
+                            #infoLibroEncontrado.small.text-muted.mt-2 (Introduce ISBN para buscar)
+                    .row.g-3.mt-2
+                        .col-md-4
+                            label.form-label Unidades
+                            input#unidadesPedido.form-control(type="number" value="1" min="1")
+                        .col-md-4.d-flex.align-items-end
+                            button#btnAnadirLibro.btn.btn-success.w-100(type="button" disabled) Añadir al Carrito
+
+        //- ACORDEÓN 3: ENVÍO Y PAGO
+        .accordion-item
+            h2.accordion-header#headerEnvio
+                button#btnAcordeonEnvio.accordion-button.collapsed(type="button" data-bs-toggle="collapse" data-bs-target="#collapseEnvio" disabled) 3. Envío y Resumen
+            #collapseEnvio.accordion-collapse.collapse(data-bs-parent="#acordeonPedido")
+                .accordion-body
+                    label.form-label Tipo de Envío
+                    select#selectEnvio.form-select.mb-3
+                        //- Se carga desde JS
+
+                    #resumenPedido.table-responsive.mt-4
+                        table.table.table-hover.table-sm
+                            thead.table-light
+                                tr
+                                    th Libro
+                                    th Cant.
+                                    th Precio
+                                    th Total
+                            tbody#tbodyResumen
+                                //- Se llena dinámicamente con JS
+
+                        .row.justify-content-end.mt-3
+                            .col-md-4.text-end
+                                p.mb-1 Subtotal: 
+                                    span#resumenSubtotal.fw-bold 0.00
+                                    | €
+                                p.mb-1 IVA (21%): 
+                                    span#resumenIva.fw-bold 0.00
+                                    | €
+                                p.h5 Total: 
+                                    span#resumenTotal.text-primary.fw-bold 0.00
+                                    | €

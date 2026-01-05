@@ -1,0 +1,57 @@
+extends layout
+
+block main
+    h2.h5.mb-3 Gestión de Clientes
+    //- Formulario de registro (se mantiene arriba a ancho completo)
+    .card.mb-4
+        .card-header.bg-primary.text-white Registrar Nuevo Cliente
+        .card-body
+            form#formCliente.needs-validation(novalidate)
+                .row.g-3
+                    .col-md-4
+                        label.form-label(for="dni") DNI
+                        .input-group.has-validation
+                            input#dni.form-control(type="text" name="dni" pattern="^[0-9]{8}$" required)
+                            .invalid-feedback#dni-error El DNI es obligatorio, debe tener formato válido y ser único.
+                    .col-md-4
+                        label.form-label(for="nombre") Nombre Completo
+                        input#nombre.form-control(type="text" name="nombre" minlength="3" required)
+                        .invalid-feedback Mínimo 3 caracteres.
+                    .col-md-4
+                        label.form-label(for="direccion") Dirección
+                        input#direccion.form-control(type="text" name="direccion" required)
+                        .invalid-feedback La dirección es obligatoria.
+
+                .mt-3
+                    button.btn.btn-success(type="submit") Registrar Cliente
+                    button.btn.btn-secondary.ms-2(type="reset") Limpiar
+
+    hr
+
+    //- NUEVA ESTRUCTURA: Fila con dos columnas para separar tabla y panel
+    .row
+        //- Columna de la izquierda para el Listado (ocupa 7 de 12 espacios)
+        .col-lg-7
+            h3.h6.mb-3 Listado de Clientes 
+            .table-responsive
+                table.table.table-hover#tablaClientes
+                    thead.table-dark
+                        tr
+                            th DNI
+                            th Nombre
+                            th Dirección
+                            th Pedidos
+                            th Acciones
+                    tbody
+
+        //- Columna de la derecha para el Panel de Pedidos (ocupa 5 de 12 espacios)
+        .col-lg-5
+            #panelPedidos.d-none
+                .card.border-info.sticky-top(style="top: 20px;")
+                    .card-header.d-flex.justify-content-between.align-items-center
+                        h4.h6.mb-0 Pedidos de:
+                        span#nombreClientePedido.fw-bold
+                        button.btn-close(type="button" onclick="document.getElementById('panelPedidos').classList.add('d-none')")
+                    .card-body
+                        //- Cambiado a row-cols-1 para que las Cards se vean bien en una columna estrecha
+                        #contenedorCards.row.row-cols-1.g-3
