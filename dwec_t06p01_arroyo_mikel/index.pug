@@ -1,22 +1,52 @@
-extends layout.pug 
+extends layout.pug
 
 block main
-    section#buscador.mb-5
-        h2 Buscador de personajes 
+    section#buscador.container.mb-5
+        h2 Buscador de personajes
         form#form-busqueda.row.g-2.mb-3
-            .col-12.col-md-8
-                input#input-busqueda.form-control(type="text" placeholder="Introduce el nombre del personaje...")
-            .col-12.col-md-4
-                button#btn-buscar.btn.btn-primary.w-100(type="submit") Buscar
-        #mensajes-error.mb-3
+            .col-8
+                input#input-busqueda.form-control(type="text", placeholder="Escribe un nombre...")
+            .col-4
+                button.btn.btn-primary.w-100(type="submit") Buscar
 
-        .table-responsive 
-            table#tabla-resultados.table.table-hover-align-middle(hidden)
-                thead 
-                    tr
-                        th Foto
-                        th Nombre
-                        th Casa
-                tbody#cuerpo-tabla
+        #mensajes-error
+
+        table#tabla-resultados.table.table-striped.mt-3(hidden)
+            thead.table-dark
+                tr
+                    th Foto
+                    th Nombre
+                    th Casa
+                    th Acción
+            tbody#cuerpo-tabla
+
     hr.my-5
-    
+
+    section#seccion-bienvenida.container.mb-5
+        h2.text-center.text-success Bienvenida al Mundo Mágico
+        #loader.text-center.mt-4
+            .spinner-border(role="status")
+                span.visually-hidden Cargando...
+        #contenedor-personajes.row.g-4.mt-3
+
+    hr.my-5
+
+    section#seccion-favoritos.container.mb-5
+        h2.text-center.text-success.mb-4 Favoritos
+        .alert.alert-warning.text-center.shadow-sm(role="alert")
+            strong ¡Próximamente! 
+            | La gestión de favoritos se implementará en breve.
+
+    hr.my-5
+
+    section#seccion-quienes-somos.container.mb-5.pb-5
+        h2.text-center.text-success.mb-4 Quiénes somos
+        .row.justify-content-center
+            .col-md-10.col-lg-8
+                .card.shadow-sm.border-0
+                    .card-body.p-4
+                        h4.card-title.text-center.mb-3 Propósito de la aplicación
+                        p.card-text.text-center
+                            | Esta aplicación ha sido desarrollada como parte del módulo de Desarrollo de Aplicaciones Web. 
+                            | Su objetivo principal es demostrar el consumo de APIs externas (HP-API), 
+                            | la manipulación del DOM en tiempo real y la gestión asíncrona de datos con JavaScript.
