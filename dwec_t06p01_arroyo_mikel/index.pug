@@ -1,0 +1,22 @@
+extends layout.pug 
+
+block main
+    section#buscador.mb-5
+        h2 Buscador de personajes 
+        form#form-busqueda.row.g-2.mb-3
+            .col-12.col-md-8
+                input#input-busqueda.form-control(type="text" placeholder="Introduce el nombre del personaje...")
+            .col-12.col-md-4
+                button#btn-buscar.btn.btn-primary.w-100(type="submit") Buscar
+        #mensajes-error.mb-3
+
+        .table-responsive 
+            table#tabla-resultados.table.table-hover-align-middle(hidden)
+                thead 
+                    tr
+                        th Foto
+                        th Nombre
+                        th Casa
+                tbody#cuerpo-tabla
+    hr.my-5
+    
