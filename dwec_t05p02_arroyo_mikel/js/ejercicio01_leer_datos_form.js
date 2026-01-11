@@ -6,12 +6,13 @@ class LeerDatosForm extends LeerDatos {
     }
 
     leerDNI(valor) {
-        const v = valor.trim().toUpperCase();
-        return /^[0-9]{8}[A-Z]$/.test(v) ? v : null;
+        const v = valor.trim();
+        return /^[0-9]{8}$/.test(v) ? v : null;
     }
 
     leerISBN(valor) {
         const v = valor.trim();
+      
         return /^[0-9]{10}([0-9]{3})?$/.test(v) ? v : null;
     }
 
@@ -20,8 +21,14 @@ class LeerDatosForm extends LeerDatos {
         return !isNaN(n) && n > 0 ? n : null;
     }
 
+    leerRealPositivo(valor) {
+        const n = Number(valor);
+        // Validamos que sea número finito y mayor que 0
+        return !isNaN(n) && Number.isFinite(n) && n > 0 ? n : null;
+    }
+
     leerEnteroPositivo(valor) {
-        const n = parseInt(valor);
+        const n = Number(valor);
         return Number.isInteger(n) && n > 0 ? n : null;
     }
 }

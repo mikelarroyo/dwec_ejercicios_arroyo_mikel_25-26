@@ -1,11 +1,11 @@
-// Variable global para el pedido de la Página 4
 let pedidoActivo = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     const tienda = Tienda.getInstancia("Mi Librería DWEC");
     tienda.cargarDatosPrueba();
+    const lector = new LeerDatosForm();
 
-    // 1. GESTIÓN DE CATÁLOGO (Página 1)
+    //pagina 1
     const tbodyLibros = document.querySelector("#tablaLibros tbody");
     if (tbodyLibros) {
         const inputBusqueda = document.getElementById("inputBusqueda");
@@ -17,251 +17,384 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         ejecutarBusqueda();
+
         if (btnBuscar) btnBuscar.addEventListener("click", ejecutarBusqueda);
         if (inputBusqueda) {
             inputBusqueda.addEventListener("keypress", (e) => {
                 if (e.key === "Enter") ejecutarBusqueda();
             });
         }
+
+        tbodyLibros.addEventListener("click", (e) => {
+            const btn = e.target.closest(".btn-detalles");
+            if (btn) {
+                const isbn = btn.dataset.isbn;
+                const info = tienda.obtenerDetallesLibroHTML(isbn);
+                if (info) {
+                    document.getElementById("modalTitulo").innerText = info.titulo;
+                    document.getElementById("modalContenido").innerHTML = info.cuerpo;
+                    new bootstrap.Modal(document.getElementById("modalDetalles")).show();
+                }
+            }
+        });
     }
 
+    //pagina 2
     const formCliente = document.getElementById("formCliente");
-    const tbodyClientes = document.querySelector("#tablaClientes tbody");
-    if (formCliente || tbodyClientes) {
+    if (formCliente) {
+        const tbodyClientes = document.querySelector("#tablaClientes tbody");
+
         const refrescarTablaClientes = () => {
             if (tbodyClientes) tbodyClientes.innerHTML = tienda.renderizarTablaClientes();
         };
         refrescarTablaClientes();
 
-        if (formCliente) {
-            formCliente.addEventListener("submit", (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                const inputDni = document.getElementById("dni");
-                if (tienda.clientes.existeClientePorDNI(inputDni.value)) {
-                    inputDni.setCustomValidity("El DNI ya existe.");
-                } else {
-                    inputDni.setCustomValidity("");
-                }
-
-                if (!formCliente.checkValidity()) {
-                    formCliente.classList.add("was-validated");
-                    return;
-                }
-
-                try {
-                    const dni = parseInt(inputDni.value);
-                    const nombre = document.getElementById("nombre").value;
-                    const direccion = document.getElementById("direccion").value;
-
-                    tienda.registrarNuevoCliente(dni, nombre, direccion);
-                    formCliente.reset();
-                    formCliente.classList.remove("was-validated");
-                    refrescarTablaClientes();
-                    alert("Cliente registrado con éxito");
-                } catch (error) {
-                    alert("Error: " + error.message);
+        if (tbodyClientes) {
+            tbodyClientes.addEventListener("click", (e) => {
+                const btn = e.target.closest(".btn-pedidos");
+                if (btn) {
+                    const dni = btn.dataset.dni;
+                    const infoPedidos = tienda.obtenerPedidosClienteHTML(dni);
+                    const panel = document.getElementById("panelPedidos");
+                    if (infoPedidos && panel) {
+                        document.getElementById("nombreClientePedido").innerText = infoPedidos.nombre;
+                        document.getElementById("contenedorCards").innerHTML = infoPedidos.htmlCards;
+                        panel.classList.remove("d-none");
+                    }
                 }
             });
         }
+
+        formCliente.addEventListener("submit", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const inputDni = document.getElementById("dni");
+            if (tienda.clientes.existeClientePorDNI(inputDni.value)) {
+                inputDni.setCustomValidity("El DNI ya existe.");
+            } else {
+                inputDni.setCustomValidity("");
+            }
+
+            if (formCliente.checkValidity()) {
+                try {
+                    const dni = lector.leerDNI(inputDni.value);
+                    const nombre = lector.leerTextoObligatorio(document.getElementById("nombre").value);
+                    const direccion = lector.leerTextoObligatorio(document.getElementById("direccion").value);
+
+                    if (dni && nombre && direccion) {
+                        tienda.registrarNuevoCliente(dni, nombre, direccion);
+                        alert("Cliente registrado con éxito.");
+                        formCliente.reset();
+                        formCliente.classList.remove("was-validated");
+                        refrescarTablaClientes();
+                    }
+                } catch (error) {
+                    alert("Error: " + error.message);
+                }
+            } else {
+                formCliente.classList.add("was-validated");
+            }
+        });
     }
 
-    // 3. GESTIÓN DE LIBROS (Página 3)
+    // ======================================================
+    // PÁGINAS 3 Y 4 (Gestión separada)
+    // ======================================================
     const formLibro = document.getElementById("formLibro");
     if (formLibro) {
-        iniciarGestionLibros(tienda, formLibro);
+        iniciarGestionLibros(tienda, formLibro, lector);
     }
 
-    // 4. GESTIÓN DE PEDIDOS (Página 4 - Acordeones)
     const btnBuscarC = document.getElementById("btnBuscarCliente");
     if (btnBuscarC) {
-        iniciarGestionPedidos(tienda);
+        iniciarGestionPedidos(tienda, lector);
     }
 });
 
-function iniciarGestionLibros(tienda, formLibro) {
-    const autoresSelect = document.getElementById("autoresSelect");
-    const tipoLibroSelect = document.getElementById("tipoLibro");
-    const camposPapel = document.getElementById("camposPapel");
-    const camposEbook = document.getElementById("camposEbook");
+// FUNCIONES AUXILIARES
 
+function iniciarGestionLibros(tienda, formLibro, lector) {
+    console.log("--> Iniciando gestión de libros...");
+    const selectGenero = document.getElementById("genero");
+    const selectAutores = document.getElementById("autoresSelect");
+
+    if (selectGenero) {
+
+        const generosSet = Libro.GENEROS_LITERARIOS || Libro.GENEROS || new Set(["novela", "ciencia ficcion", "fantasia"]);
+
+        let html = '<option value="" selected disabled>Selecciona un género...</option>';
+        generosSet.forEach(g => {
+            const texto = g.charAt(0).toUpperCase() + g.slice(1);
+            html += `<option value="${g}">${texto}</option>`;
+        });
+        selectGenero.innerHTML = html;
+    }
+
+    // B) Autores: Función para recargar la lista
     const cargarAutores = () => {
-        const lista = tienda.autores.listadoAutores;
-        autoresSelect.innerHTML = lista
-            .map(autor => `<option value="${autor.nombreCompleto}">${autor.nombreCompleto}</option>`)
-            .join("");
+        if (selectAutores) {
+            const ordenados = [...tienda.autores.listadoAutores].sort((a, b) => a.nombreCompleto.localeCompare(b.nombreCompleto));
+            selectAutores.innerHTML = ordenados.map(a =>
+                `<option value="${a.nombreCompleto}">${a.nombreCompleto}</option>`
+            ).join("");
+        }
     };
     cargarAutores();
 
-    tipoLibroSelect.addEventListener("change", () => {
-        const esPapel = tipoLibroSelect.value === "papel";
-        camposPapel.classList.toggle("d-none", !esPapel);
-        camposEbook.classList.toggle("d-none", esPapel);
-    });
+    const selectTipo = document.getElementById("tipoLibro");
+    const divPapel = document.getElementById("camposPapel");
+    const divEbook = document.getElementById("camposEbook");
+
+    const radioExistente = document.getElementById("modoExistente");
+    const radioNuevo = document.getElementById("modoNuevo");
+    const divAutorSelect = document.getElementById("divAutorSelect");
+    const divAutorNuevo = document.getElementById("divAutorNuevo");
+    const inputNuevoAutor = document.getElementById("nuevoAutorNombre");
+
+    const actualizarTipo = () => {
+        const esPapel = (selectTipo.value === "papel");
+        if (esPapel) {
+            divPapel.classList.remove("d-none");
+            divEbook.classList.add("d-none");
+            document.getElementById("peso").required = true;
+            document.getElementById("dimensiones").required = true;
+            document.getElementById("stock").required = true;
+            document.getElementById("tamanio").required = false;
+        } else {
+            divPapel.classList.add("d-none");
+            divEbook.classList.remove("d-none");
+            // Ajustamos required
+            document.getElementById("peso").required = false;
+            document.getElementById("dimensiones").required = false;
+            document.getElementById("stock").required = false;
+            document.getElementById("tamanio").required = true;
+        }
+    };
+    selectTipo.addEventListener("change", actualizarTipo);
+    actualizarTipo();
+
+    const actualizarModoAutor = () => {
+        const esNuevo = radioNuevo.checked;
+        if (esNuevo) {
+            divAutorSelect.classList.add("d-none");
+            divAutorNuevo.classList.remove("d-none");
+            selectAutores.required = false;
+            inputNuevoAutor.required = true;
+        } else {
+            divAutorSelect.classList.remove("d-none");
+            divAutorNuevo.classList.add("d-none");
+            selectAutores.required = true;
+            inputNuevoAutor.required = false;
+        }
+    };
+    radioExistente.addEventListener("change", actualizarModoAutor);
+    radioNuevo.addEventListener("change", actualizarModoAutor);
+    actualizarModoAutor();
 
     formLibro.addEventListener("submit", (e) => {
         e.preventDefault();
-        e.stopPropagation();
 
-        const isbnInput = document.getElementById("isbn");
-        const generoInput = document.getElementById("genero");
+        const inputIsbn = document.getElementById("isbn");
+        const isbnVal = lector.leerEnteroPositivo(inputIsbn.value);
 
-        if (tienda.libros.existeLibroPorIsbn(isbnInput.value)) {
-            isbnInput.setCustomValidity("Este ISBN ya está registrado.");
+        if (tienda.libros.existeLibroPorIsbn(isbnVal)) {
+            inputIsbn.setCustomValidity("El ISBN ya existe.");
         } else {
-            isbnInput.setCustomValidity("");
+            inputIsbn.setCustomValidity("");
         }
 
-        const valorGenero = generoInput.value.toLowerCase().trim();
-        if (!Libro.GENEROS_LITERARIOS.has(valorGenero)) {
-            generoInput.setCustomValidity("Género no permitido.");
+        let autorNuevoObj = null;
+        let autoresSeleccionados = [];
+
+        if (radioNuevo.checked) {
+            const nombreNuevo = inputNuevoAutor.value.trim();
+            const existe = tienda.autores.listadoAutores.some(a => a.nombreCompleto.toLowerCase() === nombreNuevo.toLowerCase());
+
+            if (existe) {
+                inputNuevoAutor.setCustomValidity("Este autor ya existe. Selecciónalo de la lista.");
+            } else if (nombreNuevo.length < 3) {
+                inputNuevoAutor.setCustomValidity("El nombre es muy corto.");
+            } else {
+                inputNuevoAutor.setCustomValidity("");
+                autorNuevoObj = new Autor(nombreNuevo);
+            }
         } else {
-            generoInput.setCustomValidity("");
+            autoresSeleccionados = Array.from(selectAutores.selectedOptions).map(opt =>
+                tienda.autores.listadoAutores.find(a => a.nombreCompleto === opt.value)
+            );
         }
 
         if (!formLibro.checkValidity()) {
             formLibro.classList.add("was-validated");
-            return;
+            return; 
         }
 
         try {
-            const isbn = isbnInput.value;
-            const titulo = document.getElementById("titulo").value;
-            const genero = generoInput.value;
-            const precio = parseFloat(document.getElementById("precio").value);
-            const nombresAutores = Array.from(autoresSelect.selectedOptions).map(opt => opt.value);
-            const autoresObj = nombresAutores.map(nombre => tienda.autores.buscarAutoresPorNombre(nombre));
-
-            let nuevoLibro;
-            if (tipoLibroSelect.value === "papel") {
-                const stock = parseInt(document.getElementById("stock").value);
-                const peso = parseFloat(document.getElementById("peso").value);
-                const dimensiones = document.getElementById("dimensiones").value;
-                nuevoLibro = new LibroPapel(isbn, titulo, autoresObj, genero, precio, peso, dimensiones, stock);
-            } else {
-                const tamanio = parseFloat(document.getElementById("tamanio").value);
-                const formato = document.getElementById("formato").value;
-                nuevoLibro = new Ebook(isbn, titulo, autoresObj, genero, precio, tamanio, formato);
+            if (radioNuevo.checked && autorNuevoObj) {
+                tienda.autores.insertarAutores([autorNuevoObj]);
+                autoresSeleccionados = [autorNuevoObj];
+                cargarAutores();
+                alert(`Autor "${autorNuevoObj.nombreCompleto}" creado correctamente.`);
             }
 
-            tienda.libros.insertarLibros([nuevoLibro]);
-            autoresObj.forEach(a => { if (a) a.insertarLibro(nuevoLibro); });
+            const titulo = lector.leerTextoObligatorio(document.getElementById("titulo").value);
+            const precio = lector.leerRealPositivo(document.getElementById("precio").value);
+            const genero = document.getElementById("genero").value;
+            let nuevoLibro = null;
 
-            alert(`Libro "${titulo}" guardado correctamente`);
-            formLibro.reset();
-            formLibro.classList.remove("was-validated");
-            cargarAutores();
+            if (selectTipo.value === "papel") {
+                const peso = lector.leerRealPositivo(document.getElementById("peso").value);
+                const dimensiones = document.getElementById("dimensiones").value; 
+                const stock = lector.leerEnteroPositivo(document.getElementById("stock").value);
+
+                nuevoLibro = new LibroPapel(isbnVal, titulo, autoresSeleccionados, genero, precio, peso, dimensiones, stock);
+            } else {
+                const tamanio = lector.leerRealPositivo(document.getElementById("tamanio").value);
+                const formato = document.getElementById("formato").value;
+
+                nuevoLibro = new Ebook(isbnVal, titulo, autoresSeleccionados, genero, precio, tamanio, formato);
+            }
+
+            if (nuevoLibro) {
+                tienda.libros.insertarLibros([nuevoLibro]);
+                autoresSeleccionados.forEach(a => a.insertarLibro(nuevoLibro));
+
+                alert("Libro registrado con éxito.");
+                formLibro.reset();
+                formLibro.classList.remove("was-validated");
+                actualizarTipo();
+                radioExistente.checked = true;
+                actualizarModoAutor();
+            }
+
         } catch (error) {
             alert("Error: " + error.message);
         }
     });
 }
 
-function iniciarGestionPedidos(tienda) {
+function iniciarGestionPedidos(tienda, lector) {
+    const selectEnvio = document.getElementById("selectEnvio");
+    if (selectEnvio) {
+        selectEnvio.innerHTML = '<option value="" selected disabled>Selecciona un envío...</option>' +
+            tienda.tiposEnvios.lista.map(t =>
+                `<option value="${t.nombre}">${t.nombre} (${t.precio.toFixed(2)}€)</option>`
+            ).join("");
+    }
+
+    const inputDni = document.getElementById("dniBusquedaPedido");
+    const divInfo = document.getElementById("infoClienteSeleccionado");
+    const spanNombre = document.getElementById("nombreClienteActivo");
     const btnBuscarC = document.getElementById("btnBuscarCliente");
-    const inputDniC = document.getElementById("dniBusquedaPedido");
-    const infoC = document.getElementById("infoClienteSeleccionado");
-    const nombreC = document.getElementById("nombreClienteActivo");
-    const btnDesmarcar = document.getElementById("btnDesmarcarCliente");
+    const btnDesmarcarC = document.getElementById("btnDesmarcarCliente");
 
-    // Función interna para llenar el combo de envíos
-    const cargarComboEnvios = () => {
-        const selectEnvio = document.getElementById("selectEnvio");
-        if (selectEnvio) {
-            const lista = tienda.tiposEnvios.lista;
-            selectEnvio.innerHTML = '<option value="" selected disabled>Selecciona un envío...</option>' + 
-                lista.map(t => `<option value="${t.nombre}">${t.nombre} (${t.precio.toFixed(2)}€)</option>`).join("");
-        }
-    };
+    const inputIsbn = document.getElementById("isbnBusquedaPedido");
+    const btnBuscarLibro = document.getElementById("btnBuscarLibroPedido");
+    const infoLibro = document.getElementById("infoLibroEncontrado");
+    const btnAnadirLibro = document.getElementById("btnAnadirLibro");
+    const inputUnidades = document.getElementById("unidadesPedido");
 
-    // Acordeón 1: Buscar Cliente
+    // 1. Buscar Cliente
     btnBuscarC.addEventListener("click", () => {
-        const cliente = tienda.clientes.buscarClientePorDNI(inputDniC.value);
+        const dniVal = lector.leerEnteroPositivo(inputDni.value);
+        const cliente = tienda.clientes.buscarClientePorDNI(dniVal);
+
         if (!cliente) {
-            alert("El cliente no existe.");
+            alert("Cliente no encontrado.");
             return;
         }
 
         pedidoActivo = new Pedido(cliente);
-        nombreC.innerText = cliente.nombreCompleto;
-        infoC.classList.remove("d-none");
+        spanNombre.innerText = cliente.nombreCompleto;
+        divInfo.classList.remove("d-none");
+        inputDni.disabled = true;
         btnBuscarC.disabled = true;
-        inputDniC.disabled = true;
-
-        // Habilitar acordeones y cargar envíos
         document.getElementById("btnAcordeonLibros").disabled = false;
         document.getElementById("btnAcordeonEnvio").disabled = false;
-        cargarComboEnvios(); 
+        new bootstrap.Collapse(document.getElementById("collapseLibros"), { show: true });
     });
 
-    btnDesmarcar.addEventListener("click", () => {
+    // 2. Desmarcar Cliente
+    btnDesmarcarC.addEventListener("click", () => {
         pedidoActivo = null;
-        infoC.classList.add("d-none");
+        divInfo.classList.add("d-none");
+        inputDni.disabled = false;
+        inputDni.value = "";
         btnBuscarC.disabled = false;
-        inputDniC.disabled = false;
         document.getElementById("btnAcordeonLibros").disabled = true;
         document.getElementById("btnAcordeonEnvio").disabled = true;
-        document.getElementById("tbodyResumen").innerHTML = ""; // Limpiar tabla
+        document.getElementById("tbodyResumen").innerHTML = "";
+
+        // Reset valores visuales
+        document.getElementById("resumenSubtotal").innerText = "0.00";
+        document.getElementById("resumenTotal").innerText = "0.00";
+        document.getElementById("resumenIva").innerText = "0.00";
+        inputIsbn.value = "";
+        infoLibro.innerText = "";
+        btnAnadirLibro.disabled = true;
+        selectEnvio.value = "";
     });
 
-    // Acordeón 2: Libros
-    const btnBuscarL = document.getElementById("btnBuscarLibroPedido");
-    const inputIsbn = document.getElementById("isbnBusquedaPedido");
-    const inputCant = document.getElementById("unidadesPedido");
-    const btnAnadir = document.getElementById("btnAnadirLibro");
+    // 3. Buscar Libro
+    btnBuscarLibro.addEventListener("click", () => {
+        const isbnVal = Number(inputIsbn.value);
+        const libro = tienda.libros.buscarLibroPorIsbn(isbnVal);
 
-    btnBuscarL.addEventListener("click", () => {
-        const libro = tienda.libros.buscarLibroPorIsbn(inputIsbn.value);
-        if (!libro) {
-            alert("El ISBN no existe.");
-            btnAnadir.disabled = true;
-            return;
-        }
+        if (libro) {
+            infoLibro.innerText = `Encontrado: ${libro.titulo} (${libro.precio.toFixed(2)}€)`;
+            infoLibro.className = "small text-success mt-2 fw-bold";
+            btnAnadirLibro.disabled = false;
 
-        document.getElementById("infoLibroEncontrado").innerText = `Libro: ${libro.titulo}`;
-        btnAnadir.disabled = false;
-
-        // Si es ebook, unidades bloqueadas a 1
-        if (libro instanceof Ebook) {
-            inputCant.value = 1;
-            inputCant.disabled = true;
+            if (libro instanceof Ebook) {
+                inputUnidades.value = 1;
+                inputUnidades.disabled = true;
+            } else {
+                inputUnidades.disabled = false;
+            }
         } else {
-            inputCant.disabled = false;
+            infoLibro.innerText = "Libro no encontrado.";
+            infoLibro.className = "small text-danger mt-2 fw-bold";
+            btnAnadirLibro.disabled = true;
         }
     });
 
-    btnAnadir.addEventListener("click", () => {
-        const libro = tienda.libros.buscarLibroPorIsbn(inputIsbn.value);
-        try {
-            pedidoActivo.insertarLibro(libro, inputCant.value);
-            actualizarResumenPedido();
-            alert("Añadido al pedido");
-        } catch (error) {
-            alert(error.message);
-        }
-    });
+    // 4. Añadir Libro
+    btnAnadirLibro.addEventListener("click", () => {
+        const isbnVal = Number(inputIsbn.value);
+        const cantVal = parseInt(inputUnidades.value);
+        const libro = tienda.libros.buscarLibroPorIsbn(isbnVal);
 
-    // Acordeón 3: Gestión de Envío (Validación de peso)
-    const selectEnvio = document.getElementById("selectEnvio");
-    if (selectEnvio) {
-        selectEnvio.addEventListener("change", (e) => {
-            const nombreEnvio = e.target.value;
-            const tipo = tienda.tiposEnvios.buscarTiposPorNombre(nombreEnvio);
-            
+        if (libro) {
             try {
-                // El método establecerTipoEnvio valida el peso total
-                if (pedidoActivo.establecerTipoEnvio(tipo)) {
-                    actualizarResumenPedido();
-                }
-            } catch (error) {
-                alert("Error con el envío: " + error.message);
-                e.target.value = ""; // Resetea selección si el peso supera el máximo
+                pedidoActivo.insertarLibro(libro, cantVal);
+                actualizarResumenPedido();
+                infoLibro.innerText = "Libro añadido al pedido.";
+                infoLibro.className = "small text-primary mt-2";
+                inputIsbn.value = "";
+                btnAnadirLibro.disabled = true;
+            } catch (e) {
+                alert(e.message);
+            }
+        }
+    });
+
+    // 5. Envío
+    if (selectEnvio) {
+        selectEnvio.addEventListener("change", () => {
+            if (!pedidoActivo) return;
+            const envioObj = tienda.tiposEnvios.lista.find(t => t.nombre === selectEnvio.value);
+            try {
+                pedidoActivo.establecerTipoEnvio(envioObj);
+                actualizarResumenPedido();
+            } catch (e) {
+                alert(e.message);
+                selectEnvio.value = "";
             }
         });
     }
 
-    // Botón Pagar (Finalizar)
+    // Botón Pagar (Si existe)
     const btnPagar = document.getElementById("btnPagarPedido");
     if (btnPagar) {
         btnPagar.addEventListener("click", () => {
@@ -270,67 +403,24 @@ function iniciarGestionPedidos(tienda) {
                 return;
             }
             tienda.pedidos.insertarPedido([pedidoActivo]);
-            alert("Pedido realizado con éxito. ¡Gracias por su compra!");
-            location.reload(); // Recargamos para limpiar y cargar datos de prueba frescos
+            alert("Pedido realizado con éxito.");
+            location.reload();
         });
     }
 }
 
 function actualizarResumenPedido() {
-    const tbody = document.getElementById("tbodyResumen");
-    if (!tbody || !pedidoActivo) return;
-
-    // Calculamos totales internos del objeto Pedido
-    pedidoActivo.calcularTotal();
-
-    // Generamos las filas de la tabla dinámicamente
-    let htmlFilas = "";
     
-    // Recorremos el Map de libros del pedido
-    pedidoActivo.librosPedido.forEach((item) => {
-        const libro = item.libro;
-        const unidades = item.unidades;
-        const subtotalFila = libro.precio * unidades;
+    const tienda = Tienda.getInstancia(); 
+    
+    if (!pedidoActivo) return;
 
-        htmlFilas += `
-            <tr>
-                <td>${libro.titulo}</td>
-                <td>${unidades}</td>
-                <td>${libro.precio.toFixed(2)}€</td>
-                <td>${subtotalFila.toFixed(2)}€</td>
-            </tr>`;
-    });
+    const datos = tienda.obtenerResumenPedidoDatos(pedidoActivo);
 
-    tbody.innerHTML = htmlFilas;
-
-    // Actualizamos los campos de texto con los cálculos del objeto Pedido
-    const subtotal = pedidoActivo.precioTotalConEnvioSinIVA;
-    const totalConIva = pedidoActivo.precioTotalConEnvioConIVA;
-    const cuotaIva = totalConIva - subtotal;
-
-    document.getElementById("resumenSubtotal").innerText = subtotal.toFixed(2);
-    document.getElementById("resumenIva").innerText = cuotaIva.toFixed(2);
-    document.getElementById("resumenTotal").innerText = totalConIva.toFixed(2);
-}
-
-// Funciones para modales (Página 1)
-function verDetalles(isbn) {
-    const tienda = Tienda.getInstancia();
-    const info = tienda.obtenerDetallesLibroHTML(isbn);
-    if (info) {
-        document.getElementById("modalTitulo").innerText = info.titulo;
-        document.getElementById("modalContenido").innerHTML = info.cuerpo;
-        new bootstrap.Modal(document.getElementById("modalDetalles")).show();
-    }
-}
-
-function verPedidosCliente(dni) {
-    const tienda = Tienda.getInstancia();
-    const infoPedidos = tienda.obtenerPedidosClienteHTML(dni);
-    const panel = document.getElementById("panelPedidos");
-    if (infoPedidos && panel) {
-        document.getElementById("nombreClientePedido").innerText = infoPedidos.nombre;
-        document.getElementById("contenedorCards").innerHTML = infoPedidos.htmlCards;
-        panel.classList.remove("d-none");
+    if (datos) {
+        document.getElementById("tbodyResumen").innerHTML = datos.htmlFilas;
+        document.getElementById("resumenSubtotal").innerText = datos.subtotal;
+        document.getElementById("resumenIva").innerText = datos.iva;
+        document.getElementById("resumenTotal").innerText = datos.total;
     }
 }

@@ -41,12 +41,11 @@ class LeerDatos {
 
 class LeerDatosPrompt extends LeerDatos {
 
-    // --- MÉTODOS BÁSICOS (Lanzan excepción si son inválidos o se cancela) ---
+
 
     leerEntero(mensaje_o_id) {
         const texto = prompt(mensaje_o_id);
 
-        // 1. Comprobación de cancelación (null)
         if (texto === null) {
             throw new Error("Entrada cancelada por el usuario.");
         }

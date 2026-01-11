@@ -14,42 +14,58 @@ block main
                     .col-md-5
                         label.form-label(for="titulo") Título
                         input#titulo.form-control(type="text" required)
+                        .invalid-feedback Título obligatorio.
                     .col-md-4
                         label.form-label(for="genero") Género
-                        input#genero.form-control(type="text" required)
-                
+                        select#genero.form-select(required)
+                            option(value="" selected disabled) Cargando géneros...
+                        .invalid-feedback Elige un género válido.
+
                 .row.g-3.mt-2
                     .col-md-4
-                        label.form-label(for="precio") Precio (s/ IVA)
+                        label.form-label(for="precio") Precio (€)
                         input#precio.form-control(type="number" step="0.01" required)
                     .col-md-4
                         label.form-label(for="tipoLibro") Formato
                         select#tipoLibro.form-select(required)
                             option(value="papel" selected) Libro Papel
                             option(value="ebook") Ebook
-                    .col-md-4
-                        label.form-label(for="autoresSelect") Autores (Ctrl+clic)
-                        select#autoresSelect.form-select(multiple required size="3")
-                            //- Se llenará dinámicamente con JS
 
-                //- CAMPOS DINÁMICOS 
+                    .col-md-4
+                        label.form-label Autor(es)
+                        .mb-2
+                            .form-check.form-check-inline
+                                input#modoExistente.form-check-input(type="radio" name="modoAutor" value="existente" checked)
+                                label.form-check-label(for="modoExistente") Lista
+                            .form-check.form-check-inline
+                                input#modoNuevo.form-check-input(type="radio" name="modoAutor" value="nuevo")
+                                label.form-check-label(for="modoNuevo") Nuevo
+                        #divAutorSelect
+                            select#autoresSelect.form-select(multiple size="3")
+                                //- Se llena con JS
+                            .form-text.text-muted Usa Ctrl para seleccionar varios.
+        
+                        #divAutorNuevo.d-none
+                            input#nuevoAutorNombre.form-control(type="text" placeholder="Nombre completo")
+                            .invalid-feedback#errorAutorNuevo El autor ya existe o es incorrecto.
+
                 #camposPapel.row.g-3.mt-2
                     .col-md-4
-                        label.form-label(for="stock") Stock Inicial
-                        input#stock.form-control(type="number" value="0")
+                        label.form-label(for="stock") Stock
+                        input#stock.form-control(type="number" required)
                     .col-md-4
                         label.form-label(for="peso") Peso (kg)
-                        input#peso.form-control(type="number" step="0.1")
+                        input#peso.form-control(type="number" step="0.1" required)
                     .col-md-4
                         label.form-label(for="dimensiones") Dimensiones
-                        input#dimensiones.form-control(type="text" placeholder="20x15x3")
+                        input#dimensiones.form-control(type="text" placeholder="20x15x3" required)
 
                 #camposEbook.row.g-3.mt-2.d-none
                     .col-md-6
                         label.form-label(for="tamanio") Tamaño (MB)
                         input#tamanio.form-control(type="number" step="0.1")
                     .col-md-6
-                        label.form-label(for="formato") Formato Archivo
+                        label.form-label(for="formato") Formato
                         select#formato.form-select
                             option(value="pdf") PDF
                             option(value="epub") EPUB
