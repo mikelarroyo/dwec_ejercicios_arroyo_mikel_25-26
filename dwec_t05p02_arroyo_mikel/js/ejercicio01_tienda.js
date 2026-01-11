@@ -247,24 +247,5 @@ class Tienda {
         return true;
     }
 
-    obtenerResumenPedidoDatos(pedido) {
-        if (!pedido) return null;
-        pedido.calcularTotal();
-        const htmlFilas = Array.from(pedido.librosPedido.values()).map(item => {
-            const totalLinea = item.libro.precio * item.unidades;
-            return `
-                <tr>
-                    <td>${item.libro.titulo}</td>
-                    <td>${item.unidades}</td>
-                    <td>${item.libro.precio.toFixed(2)}€</td>
-                    <td>${totalLinea.toFixed(2)}€</td>
-                </tr>`;
-        }).join("");
-        return {
-            htmlFilas: htmlFilas,
-            subtotal: pedido.precioTotalConEnvioSinIVA.toFixed(2),
-            iva: (pedido.precioTotalConEnvioConIVA - pedido.precioTotalConEnvioSinIVA).toFixed(2),
-            total: pedido.precioTotalConEnvioConIVA.toFixed(2)
-        };
-    }
+
 }

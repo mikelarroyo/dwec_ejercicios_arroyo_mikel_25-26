@@ -3,6 +3,9 @@ extends layout
 block main
     h2.h5.mb-3 Creación de Pedidos
     
+    //- Contenedor para mensajes globales (Éxito al pagar, etc.)
+    #msgGlobal.alert.d-none.mb-3
+
     //- ACORDEÓN PRINCIPAL
     #acordeonPedido.accordion
         
@@ -15,13 +18,15 @@ block main
                     .input-group.has-validation
                         input#dniBusquedaPedido.form-control(type="text" placeholder="DNI del cliente...")
                         button#btnBuscarCliente.btn.btn-primary(type="button") Buscar Cliente
-                        //- Aquí saldrá el error de DNI sin usar alert
-                        #feedbackDni.invalid-feedback.d-none
-                    
-                    #infoClienteSeleccionado.alert.alert-info.d-none.mt-3
-                        span Cliente: 
-                        strong#nombreClienteActivo 
-                        button#btnDesmarcarCliente.btn.btn-sm.btn-outline-danger.ms-3(type="button") Deseleccionar
+                        //- Feedback visual para error en DNI
+                        #feedbackDni.invalid-feedback DNI no encontrado o inválido.
+
+                    //- Alerta cuando el cliente está seleccionado
+                    #infoClienteSeleccionado.alert.alert-info.d-none.mt-3.d-flex.justify-content-between.align-items-center
+                        div
+                            span Cliente seleccionado: 
+                            strong#nombreClienteActivo 
+                        button#btnDesmarcarCliente.btn.btn-sm.btn-outline-danger(type="button") Deseleccionar / Nuevo Pedido
 
         //- 2. LIBROS
         .accordion-item
@@ -31,21 +36,22 @@ block main
                 .accordion-body
                     .row.g-3
                         .col-md-6
+                            label.form-label Buscar Libro
                             .input-group
                                 input#isbnBusquedaPedido.form-control(type="text" placeholder="ISBN del libro...")
                                 button#btnBuscarLibroPedido.btn.btn-secondary(type="button") Buscar
-                        .col-md-6
+                            //- Información del libro encontrado
                             #infoLibroEncontrado.small.text-muted.mt-2 (Introduce ISBN para buscar)
                     
-                    .row.g-3.mt-2
-                        .col-md-4
+                        .col-md-3
                             label.form-label Unidades
                             input#unidadesPedido.form-control(type="number" value="1" min="1")
-                        .col-md-4.d-flex.align-items-end
+                        
+                        .col-md-3.d-flex.align-items-end
                             button#btnAnadirLibro.btn.btn-success.w-100(type="button" disabled) Añadir al Carrito
                     
-                    //- Error al añadir libro (Stock, etc)
-                    #msgErrorLibro.small.text-danger.mt-2.d-none
+                    //- Mensaje de error al añadir (stock insuficiente, etc)
+                    #msgErrorLibro.alert.alert-danger.mt-2.d-none
 
         //- 3. ENVÍO Y RESUMEN
         .accordion-item
@@ -53,40 +59,42 @@ block main
                 button#btnAcordeonEnvio.accordion-button.collapsed(type="button" data-bs-toggle="collapse" data-bs-target="#collapseEnvio" disabled) 3. Envío y Resumen
             #collapseEnvio.accordion-collapse.collapse(data-bs-parent="#acordeonPedido")
                 .accordion-body
-                    label.form-label Tipo de Envío
-                    select#selectEnvio.form-select
-                        //- Se llena con JS
-                    
-                    //- Mensaje de error para el envío
-                    #msgErrorEnvio.small.text-danger.mt-1.mb-3.d-none
+                    .mb-3
+                        label.form-label.fw-bold Tipo de Envío
+                        select#selectEnvio.form-select
+                            //- Se llena con JS
+                        #msgErrorEnvio.small.text-danger.mt-1.d-none
 
-                    #resumenPedido.table-responsive.mt-4
-                        table.table.table-hover.table-sm
+                    h5.mt-4 Resumen del Pedido
+                    #resumenPedido.table-responsive
+                        table.table.table-hover.table-sm.align-middle
                             thead.table-light
                                 tr
                                     th Libro
                                     th Cant.
-                                    th Precio
+                                    th Precio U.
                                     th Total
                             tbody#tbodyResumen
-                                //- Se llena con JS
+                                //- Se llena dinámicamente
+                            tfoot
+                                tr
+                                    td.text-end(colspan="3") Subtotal:
+                                    td
+                                        span#resumenSubtotal.fw-bold 0.00
+                                        |  €
+                                tr
+                                    td.text-end(colspan="3") IVA (21%):
+                                    td
+                                        span#resumenIva.fw-bold 0.00
+                                        |  €
+                                tr.table-primary
+                                    td.text-end.h5(colspan="3") Total:
+                                    td.h5
+                                        span#resumenTotal.text-primary.fw-bold 0.00
+                                        |  €
 
-                        .row.justify-content-end.mt-3
-                            .col-md-4.text-end
-                                p.mb-1 Subtotal: 
-                                    span#resumenSubtotal.fw-bold 0.00
-                                    | €
-                                p.mb-1 IVA (21%): 
-                                    span#resumenIva.fw-bold 0.00
-                                    | €
-                                p.h5 Total: 
-                                    span#resumenTotal.text-primary.fw-bold 0.00
-                                    | €
-                        
-                        //- BOTONES DE ACCIÓN
-                        .row.mt-4
-                            .col-12.text-end.d-flex.justify-content-end.align-items-center
-                                //- Mensaje Global (Error al pagar o Éxito)
-                                span#msgGlobal.me-3.d-none
-                                button#btnCancelarPedido.btn.btn-danger.me-2(type="button") Cancelar
-                                button#btnPagarPedido.btn.btn-success(type="button") Pagar
+                    //- BOTONES DE ACCIÓN FINAL
+                    .row.mt-4
+                        .col-12.text-end
+                            button#btnCancelarPedido.btn.btn-danger.me-2(type="button" disabled) Cancelar
+                            button#btnPagarPedido.btn.btn-success(type="button" disabled) Pagar Pedido
