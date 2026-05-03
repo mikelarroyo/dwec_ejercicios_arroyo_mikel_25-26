@@ -1,25 +1,32 @@
 header.bg-dark.text-white.p-3
     .container.d-flex.justify-content-between.align-items-center
-        h1.h5.mb-0 ASINCRONIA HARRY POTTER
-        span.small DWEC · Ejercicio 1
+        h1.h5.mb-0 Harry Potter App
+        span.small.d-none.d-sm-inline DWEC · Asincronía y APIs
 
-nav.navbar.navbar-expand-lg.navbar-dark.bg-secondary
+nav.navbar.navbar-expand-lg.navbar-dark.bg-secondary.sticky-top
     .container
+        a.navbar-brand.d-lg-none(href="index.html") HP App
         button.navbar-toggler(
             type="button",
             data-bs-toggle="collapse",
-            data-bs-target="#menu"
+            data-bs-target="#menu",
+            aria-controls="menu",
+            aria-expanded="false",
+            aria-label="Abrir menú"
         )
             span.navbar-toggler-icon
 
         #menu.collapse.navbar-collapse
             ul.navbar-nav.me-auto
                 li.nav-item
-                    a.nav-link(href="buscador.html") Buscador
+                    a.nav-link(href="index.html#buscador") Buscador
                 li.nav-item
-                    a.nav-link(href="bienvenida.html") Bienvenida
+                    a.nav-link(href="index.html#seccion-bienvenida") Bienvenida
                 li.nav-item
-                    a.nav-link(href="favoritos.html") Favoritos
+                    a.nav-link(href="index.html#seccion-favoritos") Favoritos
                 li.nav-item
-                    a.nav-link(href="quienessomos.html") Quiénes somos
-                    
+                    a.nav-link(href="index.html#seccion-quienes-somos") Quiénes somos
+                li.nav-item
+                    a.nav-link(href="frases.html") Frases por personaje
+                li.nav-item
+                    a.nav-link(href="busqueda-avanzada.html") Búsqueda avanzada
