@@ -416,34 +416,39 @@ function iniciarGestionPedidos(tienda, lector) {
 
             if (libro) {
                 try {
-                    if (libro instanceof LibroPapel && libro.stock < unidadesVal) {
-                        throw new Error(`Stock insuficiente. Solo quedan ${libro.stock} unidades.`);
+                    if (libro instanceof LibroPapel) {
+                        const itemExistente = pedidoActivo.librosPedido.get(libro.isbn);
+                        const unidadesEnPedido = itemExistente ? itemExistente.unidades : 0;
+                        if (libro.stock < unidadesEnPedido + unidadesVal) {
+                            throw new Error(`Stock insuficiente. Solo quedan ${libro.stock} unidades (ya tienes ${unidadesEnPedido} en el pedido).`);
+                        }
+                    }
+
+                    if (libro instanceof LibroPapel && pedidoActivo.tipoEnvioPedido) {
+                        let pesoActual = 0;
+                        for (const item of pedidoActivo.librosPedido.values()) {
+                            if (item.libro instanceof LibroPapel) {
+                                pesoActual += item.libro.peso * item.unidades;
+                            }
+                        }
+                        const pesoNuevo = pesoActual + libro.peso * unidadesVal;
+                        if (pesoNuevo > pedidoActivo.tipoEnvioPedido.pesoMax) {
+                            throw new Error(`El peso total (${pesoNuevo}kg) superaría el máximo permitido (${pedidoActivo.tipoEnvioPedido.pesoMax}kg).`);
+                        }
                     }
 
                     pedidoActivo.insertarLibro(libro, unidadesVal);
 
-                    if (pedidoActivo.tipoEnvioPedido) {
-                        const envioActual = pedidoActivo.tipoEnvioPedido;
-                        try {
-                            pedidoActivo.establecerTipoEnvio(envioActual);
-                            msgErrorEnvio.classList.add("d-none");
-                        } catch (errorPeso) {
-                            alert(`Al añadir este libro, el envío "${envioActual.nombre}" ya no es válido por exceso de peso. Por favor, selecciona otro.`);
-                            selectEnvio.value = "";
-                            msgErrorEnvio.innerText = errorPeso.message;
-                            msgErrorEnvio.classList.remove("d-none");
-                        }
-                    }
-
                     actualizarResumenVisual();
                     msgErrorLibro.classList.add("d-none");
 
-                    const originalText = btnAnadirLibro.innerText;
                     btnAnadirLibro.innerText = "¡Añadido!";
                     btnAnadirLibro.classList.replace("btn-success", "btn-dark");
+                    btnAnadirLibro.disabled = true;
                     setTimeout(() => {
-                        btnAnadirLibro.innerText = originalText;
+                        btnAnadirLibro.innerText = "Añadir al Carrito";
                         btnAnadirLibro.classList.replace("btn-dark", "btn-success");
+                        btnAnadirLibro.disabled = false;
                     }, 1000);
 
                 } catch (error) {

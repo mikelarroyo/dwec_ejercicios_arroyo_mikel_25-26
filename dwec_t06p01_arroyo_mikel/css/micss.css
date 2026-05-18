@@ -1,28 +1,9 @@
 @charset "UTF-8";
 
-html {
-    scroll-behavior: smooth;
-}
-
-/* Offset para las secciones con navbar sticky */
-section {
-    scroll-margin-top: 70px;
-}
-
 p {
     font-family: Arial, sans-serif;
     font-size: 16px;
     color: #333;
     line-height: 1.5;
     margin: 10px 0;
-}
-
-/* Mapa Leaflet */
-#mapa {
-    z-index: 0;
-}
-
-/* Cookie banner encima de todo */
-#aviso-cookies {
-    z-index: 1060;
 }
