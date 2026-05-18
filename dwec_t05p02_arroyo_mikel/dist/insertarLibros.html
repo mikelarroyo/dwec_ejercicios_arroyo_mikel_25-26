@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es"></html>
+<head></head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title></title>
+<!-- Bootstrap CSS-->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<body></body>
+<header class="bg-dark text-white p-3">
+  <div class="container d-flex justify-content-between align-items-center">
+    <h1 class="h5 mb-0">Venta de libros</h1><span class="small">DWEC · Ejercicio 3</span>
+  </div>
+</header>
+<nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+  <div class="container">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="menu">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="catalogo.html">Catálogo</a></li>
+        <li class="nav-item"><a class="nav-link" href="insertarClientes.html">Clientes</a></li>
+        <li class="nav-item"><a class="nav-link" href="insertarLibros.html">Libros</a></li>
+        <li class="nav-item"><a class="nav-link" href="pedidos.html">Pedidos</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<main class="container my-4">
+  <h2 class="h5 mb-3">Gestión de Libros</h2>
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">Registrar Nuevo Libro</div>
+    <div class="card-body">
+      <form class="needs-validation" id="formLibro" novalidate>
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label" for="isbn">ISBN</label>
+            <input class="form-control" id="isbn" type="number" required>
+            <div class="invalid-feedback" id="isbn-error">El ISBN debe ser único.</div>
+          </div>
+          <div class="col-md-5">
+            <label class="form-label" for="titulo">Título</label>
+            <input class="form-control" id="titulo" type="text" required>
+            <div class="invalid-feedback">Título obligatorio.</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="genero">Género</label>
+            <select class="form-select" id="genero" required>
+              <option value="" selected disabled>Cargando géneros...</option>
+            </select>
+            <div class="invalid-feedback">Elige un género válido.</div>
+          </div>
+        </div>
+        <div class="row g-3 mt-2">
+          <div class="col-md-4">
+            <label class="form-label" for="precio">Precio (€)</label>
+            <input class="form-control" id="precio" type="number" step="0.01" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="tipoLibro">Formato</label>
+            <select class="form-select" id="tipoLibro" required>
+              <option value="papel" selected>Libro Papel</option>
+              <option value="ebook">Ebook</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Autor(es)</label>
+            <div class="mb-2">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" id="modoExistente" type="radio" name="modoAutor" value="existente" checked>
+                <label class="form-check-label" for="modoExistente">Lista</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" id="modoNuevo" type="radio" name="modoAutor" value="nuevo">
+                <label class="form-check-label" for="modoNuevo">Nuevo</label>
+              </div>
+            </div>
+            <div id="divAutorSelect">
+              <select class="form-select" id="autoresSelect" multiple size="3"></select>
+              <div class="form-text text-muted">Usa Ctrl para seleccionar varios.</div>
+            </div>
+            <div class="d-none" id="divAutorNuevo">
+              <input class="form-control" id="nuevoAutorNombre" type="text" placeholder="Nombre completo">
+              <div class="invalid-feedback" id="errorAutorNuevo">El autor ya existe o es incorrecto.</div>
+            </div>
+          </div>
+        </div>
+        <div class="row g-3 mt-2" id="camposPapel">
+          <div class="col-md-4">
+            <label class="form-label" for="stock">Stock</label>
+            <input class="form-control" id="stock" type="number" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="peso">Peso (kg)</label>
+            <input class="form-control" id="peso" type="number" step="0.1" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="dimensiones">Dimensiones</label>
+            <input class="form-control" id="dimensiones" type="text" placeholder="20x15x3" required>
+          </div>
+        </div>
+        <div class="row g-3 mt-2 d-none" id="camposEbook">
+          <div class="col-md-6">
+            <label class="form-label" for="tamanio">Tamaño (MB)</label>
+            <input class="form-control" id="tamanio" type="number" step="0.1">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="formato">Formato</label>
+            <select class="form-select" id="formato">
+              <option value="pdf">PDF</option>
+              <option value="epub">EPUB</option>
+              <option value="mobi">MOBI</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4">
+          <button class="btn btn-success" type="submit">Guardar Libro</button>
+          <button class="btn btn-secondary ms-2" type="reset">Limpiar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+<footer class="bg-dark text-white text-center py-3 mt-4">
+  <div class="container">
+    <p class="mb-0">© DWEC – Ejercicio 3</p>
+  </div>
+</footer>
+<!-- Bootstrap JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/ejercicio01_util.js"></script>
+<script src="../js/ejercicio01_leer_datos.js"></script>
+<script src="../js/ejercicio01_leer_datos_form.js"></script>
+<script src="../js/ejercicio01_autor.js"></script>
+<script src="../js/ejercicio01_autores.js"></script>
+<script src="../js/ejercicio01_libro.js"></script>
+<script src="../js/ejercicio01_libros.js"></script>
+<script src="../js/ejercicio01_cliente.js"></script>
+<script src="../js/ejercicio01_clientes.js"></script>
+<script src="../js/ejercicio01_pedido.js"></script>
+<script src="../js/ejercicio01_pedidos.js"></script>
+<script src="../js/ejercicio01_tipoEnvio.js"></script>
+<script src="../js/ejercicio01_tipoEnvios.js"></script>
+<script src="../js/ejercicio01_tienda.js"></script>
+<script src="../js/ejercicio01_dom.js"> </script>

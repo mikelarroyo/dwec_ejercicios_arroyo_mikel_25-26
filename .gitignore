@@ -438,7 +438,6 @@ yarn-error.log*
 pnpm-debug.log*
 
 # --- Cachés y builds front-end ---
-dist/
 build/
 coverage/
 .cache/

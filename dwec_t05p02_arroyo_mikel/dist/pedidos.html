@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es"></html>
+<head></head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title></title>
+<!-- Bootstrap CSS-->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<body></body>
+<header class="bg-dark text-white p-3">
+  <div class="container d-flex justify-content-between align-items-center">
+    <h1 class="h5 mb-0">Venta de libros</h1><span class="small">DWEC · Ejercicio 3</span>
+  </div>
+</header>
+<nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+  <div class="container">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="menu">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="catalogo.html">Catálogo</a></li>
+        <li class="nav-item"><a class="nav-link" href="insertarClientes.html">Clientes</a></li>
+        <li class="nav-item"><a class="nav-link" href="insertarLibros.html">Libros</a></li>
+        <li class="nav-item"><a class="nav-link" href="pedidos.html">Pedidos</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<main class="container my-4">
+  <h2 class="h5 mb-3">Creación de Pedidos</h2>
+  <div class="alert d-none mb-3" id="msgGlobal"></div>
+  <div class="accordion" id="acordeonPedido">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headerCliente">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCliente">1. Selección de Cliente</button>
+      </h2>
+      <div class="accordion-collapse collapse show" id="collapseCliente" data-bs-parent="#acordeonPedido">
+        <div class="accordion-body">
+          <div class="input-group has-validation">
+            <input class="form-control" id="dniBusquedaPedido" type="text" placeholder="DNI del cliente...">
+            <button class="btn btn-primary" id="btnBuscarCliente" type="button">Buscar Cliente</button>
+            <div class="invalid-feedback" id="feedbackDni">DNI no encontrado o inválido.</div>
+          </div>
+          <div class="alert alert-info d-none mt-3 d-flex justify-content-between align-items-center" id="infoClienteSeleccionado">
+            <div><span>Cliente seleccionado: </span><strong id="nombreClienteActivo"> </strong></div>
+            <button class="btn btn-sm btn-outline-danger" id="btnDesmarcarCliente" type="button">Deseleccionar / Nuevo Pedido</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headerLibros">
+        <button class="accordion-button collapsed" id="btnAcordeonLibros" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLibros" disabled>2. Añadir Libros al Pedido</button>
+      </h2>
+      <div class="accordion-collapse collapse" id="collapseLibros" data-bs-parent="#acordeonPedido">
+        <div class="accordion-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Buscar Libro</label>
+              <div class="input-group">
+                <input class="form-control" id="isbnBusquedaPedido" type="text" placeholder="ISBN del libro...">
+                <button class="btn btn-secondary" id="btnBuscarLibroPedido" type="button">Buscar</button>
+              </div>
+              <div class="small text-muted mt-2" id="infoLibroEncontrado">(Introduce ISBN para buscar)</div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Unidades</label>
+              <input class="form-control" id="unidadesPedido" type="number" value="1" min="1">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button class="btn btn-success w-100" id="btnAnadirLibro" type="button" disabled>Añadir al Carrito</button>
+            </div>
+          </div>
+          <div class="alert alert-danger mt-2 d-none" id="msgErrorLibro"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headerEnvio">
+        <button class="accordion-button collapsed" id="btnAcordeonEnvio" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEnvio" disabled>3. Envío y Resumen</button>
+      </h2>
+      <div class="accordion-collapse collapse" id="collapseEnvio" data-bs-parent="#acordeonPedido">
+        <div class="accordion-body">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Tipo de Envío</label>
+            <select class="form-select" id="selectEnvio"></select>
+            <div class="small text-danger mt-1 d-none" id="msgErrorEnvio"></div>
+          </div>
+          <h5 class="mt-4">Resumen del Pedido</h5>
+          <div class="table-responsive" id="resumenPedido">
+            <table class="table table-hover table-sm align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Libro</th>
+                  <th>Cant.</th>
+                  <th>Precio U.</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyResumen"></tbody>
+              <tfoot>
+                <tr>
+                  <td class="text-end" colspan="3">Subtotal:</td>
+                  <td><span class="fw-bold" id="resumenSubtotal">0.00</span> €</td>
+                </tr>
+                <tr>
+                  <td class="text-end" colspan="3">IVA (21%):</td>
+                  <td><span class="fw-bold" id="resumenIva">0.00</span> €</td>
+                </tr>
+                <tr class="table-primary">
+                  <td class="text-end h5" colspan="3">Total:</td>
+                  <td class="h5"><span class="text-primary fw-bold" id="resumenTotal">0.00</span> €</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <div class="row mt-4">
+            <div class="col-12 text-end">
+              <button class="btn btn-danger me-2" id="btnCancelarPedido" type="button" disabled>Cancelar</button>
+              <button class="btn btn-success" id="btnPagarPedido" type="button" disabled>Pagar Pedido</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<footer class="bg-dark text-white text-center py-3 mt-4">
+  <div class="container">
+    <p class="mb-0">© DWEC – Ejercicio 3</p>
+  </div>
+</footer>
+<!-- Bootstrap JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/ejercicio01_util.js"></script>
+<script src="../js/ejercicio01_leer_datos.js"></script>
+<script src="../js/ejercicio01_leer_datos_form.js"></script>
+<script src="../js/ejercicio01_autor.js"></script>
+<script src="../js/ejercicio01_autores.js"></script>
+<script src="../js/ejercicio01_libro.js"></script>
+<script src="../js/ejercicio01_libros.js"></script>
+<script src="../js/ejercicio01_cliente.js"></script>
+<script src="../js/ejercicio01_clientes.js"></script>
+<script src="../js/ejercicio01_pedido.js"></script>
+<script src="../js/ejercicio01_pedidos.js"></script>
+<script src="../js/ejercicio01_tipoEnvio.js"></script>
+<script src="../js/ejercicio01_tipoEnvios.js"></script>
+<script src="../js/ejercicio01_tienda.js"></script>
+<script src="../js/ejercicio01_dom.js"> </script>
