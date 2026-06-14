@@ -116,7 +116,7 @@ function buscarPersonajes(esSubmit) {
             botonFav.textContent = "En favoritos";
             botonFav.classList.add("btn-warning");
         } else {
-            botonFav.textContent = "Marcar favorito";
+            botonFav.textContent = "Marcar como favorito";
             botonFav.classList.add("btn-outline-warning");
         }
 
@@ -236,9 +236,9 @@ function eliminarFavorito(id) {
 
 // Mapa y geolocalización - Sección 4
 function iniciarMapa() {
-    // CAMBIA estas coordenadas por las de tu IES
-    const latIES = 43.3128;
-    const lngIES = -1.9749;
+    // IES Gregorio Prieto — Avda. de los Estudiantes S/N, Valdepeñas (Ciudad Real)
+    const latIES = 38.7733;
+    const lngIES = -3.3968;
 
     const mapa = L.map("mapa").setView([latIES, lngIES], 15);
 
@@ -248,7 +248,7 @@ function iniciarMapa() {
 
     L.marker([latIES, lngIES])
         .addTo(mapa)
-        .bindPopup("<strong>IES</strong><br>Centro educativo")
+        .bindPopup("<strong>IES Gregorio Prieto</strong><br>Valdepeñas, Ciudad Real")
         .openPopup();
 
     const msgGeo = document.getElementById("msg-geolocalizacion");
