@@ -1,52 +1,142 @@
 extends layout.pug
 
 block main
-    section#buscador.container.mb-5
-        h2 Buscador de personajes
+
+    // SECCIÓN 1: BUSCADOR
+    section#buscador.mb-5
+        h2.mb-3 Buscador de personajes
         form#form-busqueda.row.g-2.mb-3
-            .col-8
+            .col-8.col-md-10
                 input#input-busqueda.form-control(type="text", placeholder="Escribe un nombre...")
-            .col-4
+            .col-4.col-md-2
                 button.btn.btn-primary.w-100(type="submit") Buscar
-
-        #mensajes-error
-
-        table#tabla-resultados.table.table-striped.mt-3(hidden)
+        #error-buscador
+        table#tabla-buscador.table.table-striped.mt-3.d-none
             thead.table-dark
                 tr
                     th Foto
                     th Nombre
                     th Casa
                     th Acción
-            tbody#cuerpo-tabla
+            tbody#cuerpo-tabla-buscador
 
     hr.my-5
 
-    section#seccion-bienvenida.container.mb-5
-        h2.text-center.text-success Bienvenida al Mundo Mágico
-        #loader.text-center.mt-4
-            .spinner-border(role="status")
+    // ======================================
+    // SECCIÓN 2: BIENVENIDA
+    // ======================================
+    section#bienvenida.mb-5
+        h2.text-center.mb-4 Bienvenida al Mundo Mágico
+        #loader-bienvenida.text-center.my-4
+            .spinner-border.text-success(role="status")
                 span.visually-hidden Cargando...
-        #contenedor-personajes.row.g-4.mt-3
+            p.mt-2 Cargando personajes...
+        #contenedor-bienvenida.row.g-4
 
     hr.my-5
 
-    section#seccion-favoritos.container.mb-5
-        h2.text-center.text-success.mb-4 Favoritos
-        .alert.alert-warning.text-center.shadow-sm(role="alert")
-            strong ¡Próximamente! 
-            | La gestión de favoritos se implementará en breve.
+    // ======================================
+    // SECCIÓN 3: FAVORITOS
+    // ======================================
+    section#favoritos.mb-5
+        h2.text-center.mb-4 Mis Favoritos
+        #lista-favoritos
+            p.text-muted.text-center No tienes personajes favoritos todavía.
 
     hr.my-5
 
-    section#seccion-quienes-somos.container.mb-5.pb-5
-        h2.text-center.text-success.mb-4 Quiénes somos
+    // ======================================
+    // SECCIÓN 4: QUIÉNES SOMOS
+    // ======================================
+    section#quienes-somos.mb-5
+        h2.text-center.mb-4 Quiénes somos
+        .row.justify-content-center.mb-4
+            .col-md-8
+                .card.shadow-sm
+                    .card-body
+                        h5.card-title Propósito de la aplicación
+                        p.card-text
+                            | Esta aplicación ha sido desarrollada como parte del módulo de Desarrollo de Aplicaciones Web (DAW).
+                            | Su objetivo es demostrar el consumo de APIs externas, la manipulación del DOM en tiempo real
+                            | y la gestión asíncrona de datos con JavaScript moderno (async/await, fetch).
         .row.justify-content-center
-            .col-md-10.col-lg-8
-                .card.shadow-sm.border-0
-                    .card-body.p-4
-                        h4.card-title.text-center.mb-3 Propósito de la aplicación
-                        p.card-text.text-center
-                            | Esta aplicación ha sido desarrollada como parte del módulo de Desarrollo de Aplicaciones Web. 
-                            | Su objetivo principal es demostrar el consumo de APIs externas (HP-API), 
-                            | la manipulación del DOM en tiempo real y la gestión asíncrona de datos con JavaScript.
+            .col-md-8
+                h5.mb-3 Ubicación del IES
+                p#msg-geolocalizacion.text-muted.small
+                #mapa.rounded.shadow-sm(style="height: 350px;")
+
+    hr.my-5
+
+    // ======================================
+    // SECCIÓN 5: FRASES POR PERSONAJE
+    // ======================================
+    section#frases-personaje.mb-5
+        h2.mb-4 Frases por personaje
+
+        // Sub-sección 1: Selección de casa y personajes
+        .card.mb-4
+            .card-header.bg-secondary.text-white
+                h5.mb-0 1. Selecciona una casa
+            .card-body
+                select#select-casa.form-select.mb-3
+                    option(value="") -- Elige una casa --
+                    option(value="Gryffindor") Gryffindor
+                    option(value="Slytherin") Slytherin
+                    option(value="Hufflepuff") Hufflepuff
+                    option(value="Ravenclaw") Ravenclaw
+                    option(value="sin-casa") Sin casa especificada
+                #lista-personajes-frases
+
+        // Sub-sección 2: Listado de todas las frases guardadas
+        .card
+            .card-header.bg-secondary.text-white.d-flex.justify-content-between.align-items-center
+                h5.mb-0 2. Todas las frases guardadas
+                div
+                    label.text-white.me-2.small Ordenar por:
+                    select#orden-frases.form-select.form-select-sm.d-inline.w-auto
+                        option(value="desc") Más recientes primero
+                        option(value="asc") Más antiguas primero
+            .card-body
+                #listado-frases-guardadas
+
+    hr.my-5
+
+    // ======================================
+    // SECCIÓN 6: BÚSQUEDA AVANZADA POR AÑO
+    // ======================================
+    section#busqueda-avanzada.mb-5.pb-5
+        h2.mb-4 Búsqueda avanzada por año de nacimiento
+
+        // Sub-sección 1: Formulario
+        .card.mb-4
+            .card-header.bg-secondary.text-white
+                h5.mb-0 1. Introduce el rango de años
+            .card-body
+                .row.g-3.align-items-end
+                    .col-md-4
+                        label.form-label Año inicial
+                        input#anio-inicio.form-control(type="number", placeholder="Ej: 1960")
+                    .col-md-4
+                        label.form-label Año final
+                        input#anio-fin.form-control(type="number", placeholder="Ej: 1985")
+                    .col-md-4
+                        button#btn-buscar-anio.btn.btn-primary.w-100 Buscar personajes
+                #error-busqueda-avanzada.mt-3
+
+        // Sub-sección 2: Resultados en acordeón
+        #resultados-busqueda-avanzada
+
+    // ======================================
+    // MODAL: FRASES DEL PERSONAJE
+    // ======================================
+    #modal-frases.modal.fade(tabindex="-1")
+        .modal-dialog.modal-lg
+            .modal-content
+                .modal-header.bg-secondary.text-white
+                    h5.modal-title Frases del personaje
+                    button.btn-close.btn-close-white(type="button", data-bs-dismiss="modal")
+                #cuerpo-modal-frases.modal-body
+                .modal-footer
+                    button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cerrar
+                    button#btn-nueva-frase.btn.btn-outline-primary(type="button") Nueva frase
+                    button#btn-guardar-frase.btn.btn-success(type="button") Guardar frase

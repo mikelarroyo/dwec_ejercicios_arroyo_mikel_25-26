@@ -3,41 +3,57 @@
 <head></head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title></title>
+<title>Harry Potter API - DWEC</title>
 <!-- Bootstrap CSS-->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Leaflet CSS (mapas)-->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<!-- CSS personalizado-->
+<link rel="stylesheet" href="../css/micss.css">
 <body></body>
+<!-- Aviso de cookies (se muestra al entrar por primera vez)-->
+<div class="d-none position-fixed bottom-0 start-0 end-0 bg-dark text-white p-3" id="aviso-cookies">
+  <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <p class="mb-0">Esta aplicación usa cookies de sesión para mejorar tu experiencia.</p>
+    <button class="btn btn-warning btn-sm" id="btn-aceptar-cookies">Aceptar cookies</button>
+  </div>
+</div>
+<!-- Cabecera-->
 <header class="bg-dark text-white p-3">
   <div class="container d-flex justify-content-between align-items-center">
-    <h1 class="h5 mb-0">ASINCRONIA HARRY POTTER</h1><span class="small">DWEC · Ejercicio 1</span>
+    <h1 class="h5 mb-0">Harry Potter API</h1><span class="small text-muted">DWEC · T06 · Mikel Arroyo</span>
   </div>
 </header>
-<nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+<!-- Menú de navegación (href apunta a secciones de la misma página con #)-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-secondary sticky-top">
   <div class="container">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"><span class="navbar-toggler-icon"></span></button>
     <div class="collapse navbar-collapse" id="menu">
       <ul class="navbar-nav me-auto">
-        <li class="nav-item"><a class="nav-link" href="buscador.html">Buscador</a></li>
-        <li class="nav-item"><a class="nav-link" href="bienvenida.html">Bienvenida</a></li>
-        <li class="nav-item"><a class="nav-link" href="favoritos.html">Favoritos</a></li>
-        <li class="nav-item"><a class="nav-link" href="quienessomos.html">Quiénes somos</a></li>
+        <li class="nav-item"><a class="nav-link" href="#buscador">Buscador</a></li>
+        <li class="nav-item"><a class="nav-link" href="#bienvenida">Bienvenida</a></li>
+        <li class="nav-item"><a class="nav-link" href="#favoritos">Favoritos</a></li>
+        <li class="nav-item"><a class="nav-link" href="#quienes-somos">Quiénes somos</a></li>
+        <li class="nav-item"><a class="nav-link" href="#frases-personaje">Frases por personaje</a></li>
+        <li class="nav-item"><a class="nav-link" href="#busqueda-avanzada">Búsqueda avanzada</a></li>
       </ul>
     </div>
   </div>
 </nav>
 <main class="container my-4">
-  <section class="container mb-5" id="buscador">
-    <h2>Buscador de personajes</h2>
+  <!-- SECCIÓN 1: BUSCADOR-->
+  <section class="mb-5" id="buscador">
+    <h2 class="mb-3">Buscador de personajes</h2>
     <form class="row g-2 mb-3" id="form-busqueda">
-      <div class="col-8">
+      <div class="col-8 col-md-10">
         <input class="form-control" id="input-busqueda" type="text" placeholder="Escribe un nombre...">
       </div>
-      <div class="col-4">
+      <div class="col-4 col-md-2">
         <button class="btn btn-primary w-100" type="submit">Buscar</button>
       </div>
     </form>
-    <div id="mensajes-error"></div>
-    <table class="table table-striped mt-3" id="tabla-resultados" hidden>
+    <div id="error-buscador"></div>
+    <table class="table table-striped mt-3 d-none" id="tabla-buscador">
       <thead class="table-dark">
         <tr>
           <th>Foto</th>
@@ -46,46 +62,158 @@
           <th>Acción</th>
         </tr>
       </thead>
-      <tbody id="cuerpo-tabla"></tbody>
+      <tbody id="cuerpo-tabla-buscador"></tbody>
     </table>
   </section>
   <hr class="my-5">
-  <section class="container mb-5" id="seccion-bienvenida">
-    <h2 class="text-center text-success">Bienvenida al Mundo Mágico</h2>
-    <div class="text-center mt-4" id="loader">
-      <div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div>
+  <!-- ======================================-->
+  <!-- SECCIÓN 2: BIENVENIDA-->
+  <!-- ======================================-->
+  <section class="mb-5" id="bienvenida">
+    <h2 class="text-center mb-4">Bienvenida al Mundo Mágico</h2>
+    <div class="text-center my-4" id="loader-bienvenida">
+      <div class="spinner-border text-success" role="status"><span class="visually-hidden">Cargando...</span></div>
+      <p class="mt-2">Cargando personajes...</p>
     </div>
-    <div class="row g-4 mt-3" id="contenedor-personajes"></div>
+    <div class="row g-4" id="contenedor-bienvenida"></div>
   </section>
   <hr class="my-5">
-  <section class="container mb-5" id="seccion-favoritos">
-    <h2 class="text-center text-success mb-4">Favoritos</h2>
-    <div class="alert alert-warning text-center shadow-sm" role="alert"><strong>¡Próximamente! </strong>La gestión de favoritos se implementará en breve.</div>
+  <!-- ======================================-->
+  <!-- SECCIÓN 3: FAVORITOS-->
+  <!-- ======================================-->
+  <section class="mb-5" id="favoritos">
+    <h2 class="text-center mb-4">Mis Favoritos</h2>
+    <div id="lista-favoritos">
+      <p class="text-muted text-center">No tienes personajes favoritos todavía.</p>
+    </div>
   </section>
   <hr class="my-5">
-  <section class="container mb-5 pb-5" id="seccion-quienes-somos">
-    <h2 class="text-center text-success mb-4">Quiénes somos</h2>
-    <div class="row justify-content-center">
-      <div class="col-md-10 col-lg-8">
-        <div class="card shadow-sm border-0">
-          <div class="card-body p-4">
-            <h4 class="card-title text-center mb-3">Propósito de la aplicación</h4>
-            <p class="card-text text-center">
-              Esta aplicación ha sido desarrollada como parte del módulo de Desarrollo de Aplicaciones Web. 
-              Su objetivo principal es demostrar el consumo de APIs externas (HP-API), 
-              la manipulación del DOM en tiempo real y la gestión asíncrona de datos con JavaScript.
+  <!-- ======================================-->
+  <!-- SECCIÓN 4: QUIÉNES SOMOS-->
+  <!-- ======================================-->
+  <section class="mb-5" id="quienes-somos">
+    <h2 class="text-center mb-4">Quiénes somos</h2>
+    <div class="row justify-content-center mb-4">
+      <div class="col-md-8">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Propósito de la aplicación</h5>
+            <p class="card-text">
+              Esta aplicación ha sido desarrollada como parte del módulo de Desarrollo de Aplicaciones Web (DAW).
+              Su objetivo es demostrar el consumo de APIs externas, la manipulación del DOM en tiempo real
+              y la gestión asíncrona de datos con JavaScript moderno (async/await, fetch).
             </p>
           </div>
         </div>
       </div>
     </div>
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <h5 class="mb-3">Ubicación del IES</h5>
+        <p class="text-muted small" id="msg-geolocalizacion"></p>
+        <div class="rounded shadow-sm" id="mapa" style="height: 350px;"></div>
+      </div>
+    </div>
   </section>
+  <hr class="my-5">
+  <!-- ======================================-->
+  <!-- SECCIÓN 5: FRASES POR PERSONAJE-->
+  <!-- ======================================-->
+  <section class="mb-5" id="frases-personaje">
+    <h2 class="mb-4">Frases por personaje</h2>
+    <!-- Sub-sección 1: Selección de casa y personajes-->
+    <div class="card mb-4">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">1. Selecciona una casa</h5>
+      </div>
+      <div class="card-body">
+        <select class="form-select mb-3" id="select-casa">
+          <option value="">-- Elige una casa --</option>
+          <option value="Gryffindor">Gryffindor</option>
+          <option value="Slytherin">Slytherin</option>
+          <option value="Hufflepuff">Hufflepuff</option>
+          <option value="Ravenclaw">Ravenclaw</option>
+          <option value="sin-casa">Sin casa especificada</option>
+        </select>
+        <div id="lista-personajes-frases"></div>
+      </div>
+    </div>
+    <!-- Sub-sección 2: Listado de todas las frases guardadas-->
+    <div class="card">
+      <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">2. Todas las frases guardadas</h5>
+        <div>
+          <label class="text-white me-2 small">Ordenar por:</label>
+          <select class="form-select form-select-sm d-inline w-auto" id="orden-frases">
+            <option value="desc">Más recientes primero</option>
+            <option value="asc">Más antiguas primero</option>
+          </select>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="listado-frases-guardadas"></div>
+      </div>
+    </div>
+  </section>
+  <hr class="my-5">
+  <!-- ======================================-->
+  <!-- SECCIÓN 6: BÚSQUEDA AVANZADA POR AÑO-->
+  <!-- ======================================-->
+  <section class="mb-5 pb-5" id="busqueda-avanzada">
+    <h2 class="mb-4">Búsqueda avanzada por año de nacimiento</h2>
+    <!-- Sub-sección 1: Formulario-->
+    <div class="card mb-4">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">1. Introduce el rango de años</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label">Año inicial</label>
+            <input class="form-control" id="anio-inicio" type="number" placeholder="Ej: 1960">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Año final</label>
+            <input class="form-control" id="anio-fin" type="number" placeholder="Ej: 1985">
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-primary w-100" id="btn-buscar-anio">Buscar personajes</button>
+          </div>
+        </div>
+        <div class="mt-3" id="error-busqueda-avanzada"></div>
+      </div>
+    </div>
+    <!-- Sub-sección 2: Resultados en acordeón-->
+    <div id="resultados-busqueda-avanzada"></div>
+  </section>
+  <!-- ======================================-->
+  <!-- MODAL: FRASES DEL PERSONAJE-->
+  <!-- ======================================-->
+  <div class="modal fade" id="modal-frases" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-secondary text-white">
+          <h5 class="modal-title">Frases del personaje</h5>
+          <button class="btn-close btn-close-white" type="button" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="cuerpo-modal-frases"></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cerrar</button>
+          <button class="btn btn-outline-primary" id="btn-nueva-frase" type="button">Nueva frase</button>
+          <button class="btn btn-success" id="btn-guardar-frase" type="button">Guardar frase</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </main>
 <footer class="bg-dark text-white text-center py-3 mt-4">
   <div class="container">
-    <p class="mb-0">© DWEC – Ejercicio 1</p>
+    <p class="mb-0">© DWEC – T06 · Mikel Arroyo</p>
   </div>
 </footer>
 <!-- Bootstrap JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../js/ejercicio01_dom.js"> </script>
+<!-- Leaflet JS (mapas)-->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- JavaScript principal-->
+<script src="../js/ejercicio01_dom.js"></script>

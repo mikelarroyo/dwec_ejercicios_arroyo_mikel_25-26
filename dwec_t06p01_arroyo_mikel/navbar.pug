@@ -1,25 +1,25 @@
+// Aviso de cookies (se muestra al entrar por primera vez)
+#aviso-cookies.d-none.position-fixed.bottom-0.start-0.end-0.bg-dark.text-white.p-3
+    .container.d-flex.justify-content-between.align-items-center.flex-wrap.gap-2
+        p.mb-0 Esta aplicación usa cookies de sesión para mejorar tu experiencia.
+        button#btn-aceptar-cookies.btn.btn-warning.btn-sm Aceptar cookies
+
+// Cabecera
 header.bg-dark.text-white.p-3
     .container.d-flex.justify-content-between.align-items-center
-        h1.h5.mb-0 ASINCRONIA HARRY POTTER
-        span.small DWEC · Ejercicio 1
+        h1.h5.mb-0 Harry Potter API
+        span.small.text-muted DWEC · T06 · Mikel Arroyo
 
-nav.navbar.navbar-expand-lg.navbar-dark.bg-secondary
+// Menú de navegación
+nav.navbar.navbar-expand-lg.navbar-dark.bg-secondary.sticky-top
     .container
-        button.navbar-toggler(
-            type="button",
-            data-bs-toggle="collapse",
-            data-bs-target="#menu"
-        )
+        button.navbar-toggler(type="button", data-bs-toggle="collapse", data-bs-target="#menu")
             span.navbar-toggler-icon
-
         #menu.collapse.navbar-collapse
             ul.navbar-nav.me-auto
-                li.nav-item
-                    a.nav-link(href="buscador.html") Buscador
-                li.nav-item
-                    a.nav-link(href="bienvenida.html") Bienvenida
-                li.nav-item
-                    a.nav-link(href="favoritos.html") Favoritos
-                li.nav-item
-                    a.nav-link(href="quienessomos.html") Quiénes somos
-                    
+                li.nav-item: a.nav-link(href="#buscador") Buscador
+                li.nav-item: a.nav-link(href="#bienvenida") Bienvenida
+                li.nav-item: a.nav-link(href="#favoritos") Favoritos
+                li.nav-item: a.nav-link(href="#quienes-somos") Quiénes somos
+                li.nav-item: a.nav-link(href="#frases-personaje") Frases por personaje
+                li.nav-item: a.nav-link(href="#busqueda-avanzada") Búsqueda avanzada

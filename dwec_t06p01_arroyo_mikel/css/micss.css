@@ -1,9 +1,23 @@
 @charset "UTF-8";
 
-p {
+/* Estilos generales del cuerpo */
+body {
     font-family: Arial, sans-serif;
     font-size: 16px;
     color: #333;
-    line-height: 1.5;
-    margin: 10px 0;
+}
+
+/* El mapa de Leaflet necesita una altura definida para mostrarse */
+#mapa {
+    min-height: 350px;
+}
+
+/* Suavizar el scroll al navegar con el menú */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Separación extra entre secciones para que el menú sticky no tape el título */
+section {
+    scroll-margin-top: 70px;
 }

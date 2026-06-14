@@ -3,13 +3,16 @@ html(lang="es")
 head
 meta(charset="UTF-8")
 meta(name="viewport", content="width=device-width, initial-scale=1.0")
-title #{title}
+title Harry Potter API - DWEC
 
 // Bootstrap CSS
-link(
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css",
-    rel="stylesheet"
-)
+link(href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css", rel="stylesheet")
+
+// Leaflet CSS (mapas)
+link(rel="stylesheet", href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css")
+
+// CSS personalizado
+link(rel="stylesheet", href="../css/micss.css")
 
 body
 include navbar.pug
@@ -20,10 +23,10 @@ main.container.my-4
 include footer.pug
 
 // Bootstrap JS
-script(
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-)
+script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js")
 
+// Leaflet JS (mapas)
+script(src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js")
 
-
-script(src="../js/ejercicio01_dom.js") 
+// JavaScript principal
+script(src="../js/ejercicio01_dom.js")
